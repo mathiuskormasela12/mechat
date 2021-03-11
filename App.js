@@ -1,17 +1,17 @@
-import React, {useEffect} from 'react';
+// ===== App
+// import all modules
+import React, {Fragment, useEffect} from 'react';
 import RNBootSplash from 'react-native-bootsplash';
-import {Text, StyleSheet} from 'react-native';
+import StackScreen from './src/StackScreen';
 
 export default function App() {
   useEffect(() => {
     RNBootSplash.hide({fade: true});
   });
 
-  return <Text style={styles.text}>Hello</Text>;
+  return (
+    <Fragment>
+      <StackScreen />
+    </Fragment>
+  );
 }
-
-const styles = StyleSheet.create({
-  text: {
-    fontFamily: 'Geometria-Bold',
-  },
-});
