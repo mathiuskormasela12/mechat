@@ -14,7 +14,7 @@ class Chats extends Component {
   render() {
     return (
       <Fragment>
-        <Text style={styles.text}>Wkwwk</Text>
+        <Text style={styles.text}>Chats</Text>
       </Fragment>
     );
   }
