@@ -1,7 +1,7 @@
 // ===== Auth
 // import all modules
 import React, {Component, Fragment} from 'react';
-import {View, Text, ScrollView, StyleSheet} from 'react-native';
+import {View, Text, ScrollView, StyleSheet, Dimensions} from 'react-native';
 
 // import all components
 import {
@@ -92,6 +92,7 @@ export default Auth;
 const styles = StyleSheet.create({
   hero: {
     backgroundColor: 'white',
+    minHeight: Dimensions.get('window').height,
   },
   container: {
     width: '75%',

@@ -74,20 +74,20 @@ export default EmailCode;
 const styles = StyleSheet.create({
   hero: {
     backgroundColor: 'white',
-    height: Dimensions.get('window').height,
+    minHeight: Dimensions.get('window').height,
   },
   container: {
-    height: '100%',
+    height: (100 / 100) * Dimensions.get('window').height,
     width: '75%',
   },
   header: {
     width: '100%',
-    height: '30%',
+    height: (30 / 100) * Dimensions.get('window').height,
     justifyContent: 'flex-end',
   },
   form: {
     paddingTop: '15%',
-    height: '55%',
+    height: (55 / 100) * Dimensions.get('window').height,
   },
   control: {
     marginBottom: 25,
