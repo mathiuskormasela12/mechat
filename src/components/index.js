@@ -7,3 +7,5 @@ export * from './phone-field/PhoneField';
 export * from './mini-loading/MiniLoading';
 export * from './alert/Alert';
 export * from './header/Header';
+export * from './chat-list/ChatList';
+export * from './contact-list/ContactList';
