@@ -9,3 +9,6 @@ export * from './alert/Alert';
 export * from './header/Header';
 export * from './chat-list/ChatList';
 export * from './contact-list/ContactList';
+export * from './warpper/Wrapper';
+export * from './modal-input/ModalInput';
+export * from './modal-button/ModalButton';

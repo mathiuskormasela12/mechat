@@ -7,7 +7,9 @@ export function Alert(props) {
   return (
     <Fragment>
       <View style={styles.alert}>
-        <Text style={[styles.text, styles[props.type]]}>{props.children}</Text>
+        <Text style={[styles.text(props), styles[props.type]]}>
+          {props.children}
+        </Text>
       </View>
     </Fragment>
   );
@@ -18,9 +20,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     width: '100%',
   },
-  text: {
-    fontFamily: 'Goemetria',
-    fontSize: 15,
+  text: function (props) {
+    return {
+      fontFamily: 'Goemetria',
+      fontSize: !props.md ? 15 : 13,
+    };
   },
   danger: {
     color: '#dc3545',

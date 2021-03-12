@@ -1,13 +1,32 @@
 // ===== Contacts
 // import all modules
 import React, {Component, Fragment} from 'react';
-import {View, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
+import {connect} from 'react-redux';
+import {
+  View,
+  FlatList,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  Dimensions,
+} from 'react-native';
 
 // import all components
-import {ContactList} from '../components';
+import {
+  ContactList,
+  ModalInput,
+  Container,
+  ModalButton,
+  Alert,
+} from '../components';
 
 // import assets
 import Icon from 'react-native-vector-icons/Ionicons';
+
+// import all actions
+import {showWrapper} from '../redux/actions/loading';
 
 import profile from '../assets/img/profile.png';
 
@@ -46,12 +65,69 @@ class Contacts extends Component {
         },
       ],
     };
+
+    this.handleShowWrapper = this.handleShowWrapper.bind(this);
+  }
+
+  handleShowWrapper() {
+    this.props.showWrapper();
   }
 
   render() {
     return (
       <Fragment>
         <View style={styles.hero}>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={this.props.loading.showWrapper}>
+            <View style={styles.modalContainer}>
+              <ScrollView>
+                <View style={styles.form}>
+                  <Container style={styles.container}>
+                    <View style={styles.control}>
+                      <Text style={styles.label}>Contact Name</Text>
+                      <View style={styles.field}>
+                        <ModalInput
+                          placeholder="Type Your Contact Name..."
+                          type="default"
+                        />
+                        <View style={styles.alert}>
+                          <Alert type="danger" md>
+                            Contact Name Can't be empy
+                          </Alert>
+                        </View>
+                      </View>
+                    </View>
+                    <View style={styles.controlZero}>
+                      <Text style={styles.label}>Phone Number</Text>
+                      <View style={styles.field}>
+                        <ModalInput
+                          placeholder="Type Your Contact Name..."
+                          type="default"
+                        />
+                        <View style={styles.alert}>
+                          <Alert type="warning" md>
+                            Invalid Phone Number
+                          </Alert>
+                        </View>
+                      </View>
+                    </View>
+                    <View style={styles.controlBtn}>
+                      <View style={styles.btnCol}>
+                        <ModalButton>Save</ModalButton>
+                      </View>
+                      <View style={styles.btnCol}>
+                        <ModalButton onPress={this.handleShowWrapper}>
+                          Cancle
+                        </ModalButton>
+                      </View>
+                    </View>
+                  </Container>
+                </View>
+              </ScrollView>
+            </View>
+          </Modal>
           <FlatList
             data={this.state.contacts}
             keyExtractor={(item, index) => String(index)}
@@ -63,7 +139,9 @@ class Contacts extends Component {
               />
             )}
           />
-          <TouchableOpacity style={styles.contact}>
+          <TouchableOpacity
+            style={styles.contact}
+            onPress={this.handleShowWrapper}>
             <Icon name="person-add-outline" size={20} color="white" />
           </TouchableOpacity>
         </View>
@@ -72,7 +150,17 @@ class Contacts extends Component {
   }
 }
 
-export default Contacts;
+const mapStateToProps = (state) => ({
+  loading: {
+    ...state.loading,
+  },
+});
+
+const mapDispatchToProps = {
+  showWrapper,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Contacts);
 
 const styles = StyleSheet.create({
   text: {
@@ -92,5 +180,47 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#5F2EEA',
+  },
+  modalContainer: {
+    width: '100%',
+    position: 'absolute',
+    bottom: 0,
+  },
+  form: {
+    backgroundColor: 'white',
+    elevation: 1,
+    width: Dimensions.get('screen').width,
+    height: 'auto',
+    paddingTop: 30,
+  },
+  container: {
+    width: '88%',
+    height: '100%',
+    justifyContent: 'center',
+  },
+  label: {
+    fontFamily: 'ProximaNova-Regular',
+    fontSize: 16,
+    color: '#14142B',
+  },
+  control: {
+    marginBottom: 20,
+  },
+  controlZero: {
+    marginBottom: 0,
+  },
+  field: {
+    marginTop: 10,
+  },
+  btnCol: {
+    width: '27%',
+    height: 70,
+  },
+  controlBtn: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  alert: {
+    marginTop: 12,
   },
 });
