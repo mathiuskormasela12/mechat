@@ -1,10 +1,13 @@
 // ===== Contacts
 // import all modules
 import React, {Component, Fragment} from 'react';
-import {View, FlatList, StyleSheet} from 'react-native';
+import {View, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 
 // import all components
 import {ContactList} from '../components';
+
+// import assets
+import Icon from 'react-native-vector-icons/Ionicons';
 
 import profile from '../assets/img/profile.png';
 
@@ -60,6 +63,9 @@ class Contacts extends Component {
               />
             )}
           />
+          <TouchableOpacity style={styles.contact}>
+            <Icon name="person-add-outline" size={20} color="white" />
+          </TouchableOpacity>
         </View>
       </Fragment>
     );
@@ -75,5 +81,16 @@ const styles = StyleSheet.create({
   hero: {
     flex: 1,
     backgroundColor: 'white',
+  },
+  contact: {
+    position: 'absolute',
+    right: 20,
+    bottom: 30,
+    height: 50,
+    width: 50,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#5F2EEA',
   },
 });
