@@ -2,11 +2,16 @@
 // import all modules
 import React, {Fragment} from 'react';
 import {Text, View, Image, TouchableOpacity, StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
 export function ChatList(props) {
+  const navigation = useNavigation();
+
+  const goToChatList = () => navigation.navigate('Chat Room');
+
   return (
     <Fragment>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={goToChatList}>
         <View style={styles.card}>
           <View style={[styles.col, styles.little]}>
             <Image source={props.picture} style={styles.img} />

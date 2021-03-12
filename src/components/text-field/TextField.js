@@ -7,7 +7,7 @@ export function TextField(props) {
   return (
     <Fragment>
       <TextInput
-        style={styles.input}
+        style={styles.input(props)}
         placeholder={props.placeholder}
         placeholderTextColor="#C5C5C5"
         keyboardType={props.type}
@@ -17,12 +17,14 @@ export function TextField(props) {
 }
 
 const styles = StyleSheet.create({
-  input: {
-    borderRadius: 12,
-    width: '100%',
-    height: 50,
-    backgroundColor: '#F3F3F3',
-    paddingLeft: 22,
-    fontSize: 16,
+  input: function (props) {
+    return {
+      borderRadius: 12,
+      width: '100%',
+      height: props.height ? props.height : 50,
+      backgroundColor: '#F3F3F3',
+      paddingHorizontal: 22,
+      fontSize: 16,
+    };
   },
 });

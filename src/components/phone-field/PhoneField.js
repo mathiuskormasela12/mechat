@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: 'transparent',
     paddingLeft: 7,
+    paddingRight: 22,
   },
   item: {
     height: '100%',

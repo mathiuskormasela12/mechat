@@ -9,9 +9,10 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Auth from './screens/Auth';
 import EmailCode from './screens/EmailCode';
 import Home from './screens/Home';
+import ChatRoom from './screens/ChatRoom';
 
 // import all component
-import {Header, Wrapper} from './components';
+import {Header, Wrapper, HeaderChat} from './components';
 
 const Stack = createStackNavigator();
 
@@ -38,6 +39,11 @@ export default function StackScreen() {
             name="Email Code"
             component={EmailCode}
             options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Chat Room"
+            component={ChatRoom}
+            options={{header: () => <HeaderChat />}}
           />
         </Stack.Navigator>
       </NavigationContainer>
