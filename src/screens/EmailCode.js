@@ -1,7 +1,7 @@
 // ===== Auth
 // import all modules
 import React, {Component, Fragment} from 'react';
-import {View, Text, StyleSheet, Dimensions} from 'react-native';
+import {View, Text, ScrollView, StyleSheet, Dimensions} from 'react-native';
 
 // import all components
 import {
@@ -38,38 +38,40 @@ class EmailCode extends Component {
   render() {
     return (
       <Fragment>
-        <View style={styles.hero}>
-          <Container style={styles.container}>
-            <View style={styles.header}>
-              <AuthHeader />
-            </View>
-            <View style={styles.form}>
-              <View style={styles.control}>
-                <Text style={styles.label}>E-mail Code</Text>
-                <View style={styles.field}>
-                  <TextField
-                    placeholder="Type Your Email Code..."
-                    type="number-pad"
-                  />
-                  <View style={styles.alert}>
-                    <Alert type="danger">Server</Alert>
+        <ScrollView>
+          <View style={styles.hero}>
+            <Container style={styles.container}>
+              <View style={styles.header}>
+                <AuthHeader />
+              </View>
+              <View style={styles.form}>
+                <View style={styles.control}>
+                  <Text style={styles.label}>E-mail Code</Text>
+                  <View style={styles.field}>
+                    <TextField
+                      placeholder="Type Your Email Code..."
+                      type="number-pad"
+                    />
+                    <View style={styles.alert}>
+                      <Alert type="danger">Server</Alert>
+                    </View>
                   </View>
                 </View>
+                <View style={styles.control}>
+                  {this.state.loading ? (
+                    <MiniLoading />
+                  ) : (
+                    <Button onPress={this.handleSubmit}>Continue</Button>
+                  )}
+                </View>
+                <Text style={styles.text}>
+                  Read our Privacy Policy. Tap “Agree & Continue” to accept the
+                  Terms of Service.
+                </Text>
               </View>
-              <View style={styles.control}>
-                {this.state.loading ? (
-                  <MiniLoading />
-                ) : (
-                  <Button onPress={this.handleSubmit}>Continue</Button>
-                )}
-              </View>
-              <Text style={styles.text}>
-                Read our Privacy Policy. Tap “Agree & Continue” to accept the
-                Terms of Service.
-              </Text>
-            </View>
-          </Container>
-        </View>
+            </Container>
+          </View>
+        </ScrollView>
       </Fragment>
     );
   }
