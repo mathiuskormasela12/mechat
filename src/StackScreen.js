@@ -10,6 +10,7 @@ import Auth from './screens/Auth';
 import EmailCode from './screens/EmailCode';
 import Home from './screens/Home';
 import ChatRoom from './screens/ChatRoom';
+import Profile from './screens/Profile';
 
 // import all component
 import {Header, Wrapper, HeaderChat} from './components';
@@ -44,6 +45,11 @@ export default function StackScreen() {
             name="Chat Room"
             component={ChatRoom}
             options={{header: () => <HeaderChat />}}
+          />
+          <Stack.Screen
+            name="Profile"
+            component={Profile}
+            options={{headerShown: false}}
           />
         </Stack.Navigator>
       </NavigationContainer>

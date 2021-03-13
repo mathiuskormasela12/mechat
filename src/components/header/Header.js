@@ -9,16 +9,20 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 // import all assets
 import profile from '../../assets/img/profile.png';
 
 export function Header() {
+  const navigation = useNavigation();
   const [showSearchBar, setShowSearchBar] = useState(false);
 
   const handleShowSearchBar = () =>
     setShowSearchBar((currentState) => !currentState);
+
+  const goToProfile = () => navigation.navigate('Profile');
 
   return (
     <Fragment>
@@ -35,7 +39,7 @@ export function Header() {
                 <Text style={styles.text}>MeChat</Text>
               </View>
               <View style={styles.secondColoumn}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={goToProfile}>
                   <Image source={profile} style={styles.img} />
                 </TouchableOpacity>
               </View>

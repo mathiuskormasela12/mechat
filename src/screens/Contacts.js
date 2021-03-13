@@ -64,6 +64,7 @@ class Contacts extends Component {
           status: 'Busy',
         },
       ],
+      isVisible: false,
     };
 
     this.handleShowWrapper = this.handleShowWrapper.bind(this);
@@ -71,6 +72,9 @@ class Contacts extends Component {
 
   handleShowWrapper() {
     this.props.showWrapper();
+    this.setState((currentState) => ({
+      isVisible: !currentState.isVisible,
+    }));
   }
 
   render() {
@@ -80,7 +84,7 @@ class Contacts extends Component {
           <Modal
             animationType="slide"
             transparent={true}
-            visible={this.props.loading.showWrapper}>
+            visible={this.state.isVisible}>
             <View style={styles.modalContainer}>
               <ScrollView>
                 <View style={styles.form}>
@@ -104,7 +108,7 @@ class Contacts extends Component {
                       <View style={styles.field}>
                         <ModalInput
                           placeholder="Type Your Contact Name..."
-                          type="default"
+                          type="number-pad"
                         />
                         <View style={styles.alert}>
                           <Alert type="warning" md>
