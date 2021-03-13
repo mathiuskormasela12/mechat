@@ -8,6 +8,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 // import all screens
 import Auth from './screens/Auth';
 import EmailCode from './screens/EmailCode';
+import FullName from './screens/FullName';
 import Home from './screens/Home';
 import ChatRoom from './screens/ChatRoom';
 import Profile from './screens/Profile';
@@ -39,6 +40,11 @@ export default function StackScreen() {
           <Stack.Screen
             name="Email Code"
             component={EmailCode}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Full Name"
+            component={FullName}
             options={{headerShown: false}}
           />
           <Stack.Screen

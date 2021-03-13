@@ -27,12 +27,6 @@ class EmailCode extends Component {
     this.setState((state) => ({
       loading: !state.loading,
     }));
-    setTimeout(() => {
-      this.setState((state) => ({
-        loading: !state.loading,
-      }));
-      this.props.navigation.navigate('Full Name');
-    }, 2000);
   }
 
   render() {
@@ -45,11 +39,11 @@ class EmailCode extends Component {
             </View>
             <View style={styles.form}>
               <View style={styles.control}>
-                <Text style={styles.label}>E-mail Code</Text>
+                <Text style={styles.label}>Full Name</Text>
                 <View style={styles.field}>
                   <TextField
-                    placeholder="Type Your Email Code..."
-                    type="number-pad"
+                    placeholder="Type Your Full Name..."
+                    type="default"
                   />
                   <View style={styles.alert}>
                     <Alert type="danger">Server</Alert>
@@ -60,7 +54,7 @@ class EmailCode extends Component {
                 {this.state.loading ? (
                   <MiniLoading />
                 ) : (
-                  <Button onPress={this.handleSubmit}>Continue</Button>
+                  <Button onPress={this.handleSubmit}>Done</Button>
                 )}
               </View>
               <Text style={styles.text}>
