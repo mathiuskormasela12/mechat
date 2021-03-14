@@ -1,9 +1,11 @@
 // ===== StackScreen
 // import all modules
-import React, {Fragment} from 'react';
+import React, {Fragment, useEffect} from 'react';
 import {useSelector} from 'react-redux';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import FlashMessage from 'react-native-flash-message';
+import RNBootSplash from 'react-native-bootsplash';
 
 // import all screens
 import Auth from './screens/Auth';
@@ -22,11 +24,21 @@ export default function StackScreen() {
   const showWrapper = useSelector(
     (currentState) => currentState.loading.showWrapper,
   );
+  const token = useSelector((currentState) => currentState.auth.token);
+
+  useEffect(() => {
+    RNBootSplash.hide({fade: true});
+  });
 
   return (
     <Fragment>
       <NavigationContainer>
         <Stack.Navigator>
+          <Stack.Screen
+            name="Home"
+            component={Home}
+            options={{header: () => (token ? <Header /> : <Auth />)}}
+          />
           <Stack.Screen
             name="Auth"
             component={Auth}
@@ -43,11 +55,6 @@ export default function StackScreen() {
             options={{headerShown: false}}
           />
           <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{header: () => <Header />}}
-          />
-          <Stack.Screen
             name="Chat Room"
             component={ChatRoom}
             options={{header: () => <HeaderChat />}}
@@ -60,6 +67,7 @@ export default function StackScreen() {
         </Stack.Navigator>
       </NavigationContainer>
       {showWrapper && <Wrapper />}
+      <FlashMessage position="top" />
     </Fragment>
   );
 }

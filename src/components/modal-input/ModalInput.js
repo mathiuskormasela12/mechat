@@ -11,6 +11,8 @@ export function ModalInput(props) {
         placeholderTextColor="#C5C5C5"
         keyboardType={props.type}
         style={styles.input}
+        onChangeText={props.onChangeText}
+        value={props.value}
       />
     </Fragment>
   );

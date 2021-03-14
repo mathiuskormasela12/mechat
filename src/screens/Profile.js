@@ -12,10 +12,14 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {showMessage} from 'react-native-flash-message';
+import http from '../services/Services';
+import jwtdecode from 'jwt-decode';
+import formData from '../helpers/formData';
 
 // import all component
 import {Container, ModalInput, ModalButton, Alert} from '../components';
@@ -23,12 +27,17 @@ import {Container, ModalInput, ModalButton, Alert} from '../components';
 export default function Profile(props) {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const user = useSelector((currentState) => currentState.user);
+  const token = useSelector((currentState) => currentState.auth.token);
   const [isVisible, setVisible] = useState(false);
   const [state, setState] = useState({
     label: null,
     placeholder: null,
     name: null,
     type: null,
+    value: null,
+    message: null,
+    alertType: null,
   });
 
   const back = () => navigation.navigate('Home');
@@ -39,8 +48,36 @@ export default function Profile(props) {
         mediaType: 'photo',
         includeBase64: false,
       },
-      (response) => {
-        console.log(response);
+      async (response) => {
+        if (response.uri) {
+          if (response.fileSize > 3000000) {
+            showMessage({
+              message: 'Photo size must be lower than 3mb',
+              type: 'warning',
+              duration: 2000,
+              hideOnPress: true,
+            });
+          } else {
+            try {
+              const form = formData('FormData', {
+                picture: {
+                  uri: response.uri,
+                  type: response.type,
+                  name: response.fileName,
+                },
+              });
+              await http.upload(token, jwtdecode(token).id, form);
+            } catch (err) {
+              console.log(err);
+              showMessage({
+                message: err.response.data.message,
+                type: 'warning',
+                duration: 2000,
+                hideOnPress: true,
+              });
+            }
+          }
+        }
       },
     );
   };
@@ -51,8 +88,36 @@ export default function Profile(props) {
         mediaType: 'photo',
         includeBase64: false,
       },
-      (response) => {
-        console.log(response);
+      async (response) => {
+        if (response.uri) {
+          if (response.fileSize > 3000000) {
+            showMessage({
+              message: 'Photo size must be lower than 3mb',
+              type: 'warning',
+              duration: 2000,
+              hideOnPress: true,
+            });
+          } else {
+            try {
+              const form = formData('FormData', {
+                picture: {
+                  uri: response.uri,
+                  type: response.type,
+                  name: response.fileName,
+                },
+              });
+              await http.upload(token, jwtdecode(token).id, form);
+            } catch (err) {
+              console.log(err);
+              showMessage({
+                message: err.response.data.message,
+                type: 'warning',
+                duration: 2000,
+                hideOnPress: true,
+              });
+            }
+          }
+        }
       },
     );
   };
@@ -68,7 +133,147 @@ export default function Profile(props) {
       name,
       label,
       type,
+      message: null,
+      alertType: null,
+      value: user[name],
     }));
+
+    if (!state.message && !state.alertType && state.value === '') {
+      setState((c) => ({
+        ...c,
+        message: `${name} can't be empty`,
+        alertType: 'warning',
+      }));
+    }
+  };
+
+  const handleInput = (value) => {
+    const email = value.match(/[^@$a-z0-9.]/gi);
+    if (state.name === 'phoneNumber') {
+      if (!value) {
+        setState((current) => ({
+          ...current,
+          message: "Phone number can't be empty",
+          alertType: 'warning',
+        }));
+      } else if (value.match(/[^0-9]/gi) !== null || value.length < 11) {
+        setState((current) => ({
+          ...current,
+          message: 'Invalid Phone Number',
+          alertType: 'warning',
+        }));
+      } else {
+        setState((c) => ({
+          ...c,
+          message: null,
+          alertType: null,
+        }));
+      }
+    } else if (state.name === 'email') {
+      if (!value) {
+        setState((current) => ({
+          ...current,
+          message: "Email can't be empty",
+          alertType: 'warning',
+        }));
+      } else if (
+        email ||
+        !value.match(/@\b/g) ||
+        value.match(/\s/) ||
+        value.match(/\b[0-9]/) ||
+        !value.split('@').pop().includes('.')
+      ) {
+        setState((c) => ({
+          ...c,
+          message: 'Invalid Email',
+          alertType: 'warning',
+        }));
+      } else {
+        setState((c) => ({
+          ...c,
+          message: null,
+          alertType: null,
+        }));
+      }
+    } else if (state.name === 'fullName') {
+      if (!value) {
+        setState((current) => ({
+          ...current,
+          message: "Fullname can't be empty",
+          alertType: 'warning',
+        }));
+      } else {
+        setState((c) => ({
+          ...c,
+          message: null,
+          alertType: null,
+        }));
+      }
+    } else if (state.name === 'about') {
+      if (!value) {
+        setState((current) => ({
+          ...current,
+          message: "about can't be empty",
+          alertType: 'warning',
+        }));
+      } else {
+        setState((c) => ({
+          ...c,
+          message: null,
+          alertType: null,
+        }));
+      }
+    }
+    setState((currentState) => ({
+      ...currentState,
+      value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    const form = formData('URLSearchParams', {
+      [state.name]: state.value,
+    });
+    if (state.name === 'about') {
+      try {
+        await http.editAbout(token, jwtdecode(token).id, form);
+        handleShowWrapper(null, null, null, null);
+      } catch (err) {
+        console.log(err);
+        handleShowWrapper(null, null, null, null);
+      }
+    } else if (state.name === 'fullName') {
+      try {
+        await http.editFullName(jwtdecode(token).id, form);
+        handleShowWrapper(null, null, null, null);
+      } catch (err) {
+        console.log(err);
+        handleShowWrapper(null, null, null, null);
+      }
+    } else if (state.name === 'email') {
+      try {
+        await http.editEmail(token, jwtdecode(token).id, form);
+        handleShowWrapper(null, null, null, null);
+      } catch (err) {
+        console.log(err);
+        handleShowWrapper(null, null, null, null);
+      }
+    } else if (state.name === 'phoneNumber') {
+      try {
+        await http.editPhone(token, jwtdecode(token).id, form);
+        handleShowWrapper(null, null, null, null);
+      } catch (err) {
+        console.log(err);
+        handleShowWrapper(null, null, null, null);
+      }
+    }
+  };
+
+  const logout = () => {
+    dispatch({
+      type: 'LOGOUT',
+    });
+    navigation.navigate('Auth');
   };
 
   return (
@@ -84,17 +289,21 @@ export default function Profile(props) {
                     <ModalInput
                       placeholder={state.placeholder}
                       type={state.type}
+                      onChangeText={handleInput}
+                      value={state.value}
                     />
-                    <View style={styles.alert}>
-                      <Alert type="danger" md>
-                        Full Name Can't be empy
-                      </Alert>
-                    </View>
+                    {state.message && (
+                      <View style={styles.alert}>
+                        <Alert type={state.alertType} md>
+                          {state.message}
+                        </Alert>
+                      </View>
+                    )}
                   </View>
                 </View>
                 <View style={styles.controlBtn}>
                   <View style={styles.btnCol}>
-                    <ModalButton>Save</ModalButton>
+                    <ModalButton onPress={handleSubmit}>Save</ModalButton>
                   </View>
                   <View style={styles.btnCol}>
                     <ModalButton
@@ -131,8 +340,7 @@ export default function Profile(props) {
             </View>
             <Image
               source={{
-                uri:
-                  'https://img.okezone.com/content/2020/07/02/33/2239941/nayeon-twice-dapat-ancaman-pembunuhan-fans-viralkan-tagar-protectnayeon-CRG9pqFCPI.jpg',
+                uri: user.picture,
               }}
               style={styles.img}
             />
@@ -142,8 +350,8 @@ export default function Profile(props) {
               <View style={styles.boxContain}>
                 <Container style={styles.boxContainer}>
                   <View style={styles.boxCol}>
-                    <Text style={styles.name}>Im Nayeon</Text>
-                    <Text style={styles.tel}>+629521617622</Text>
+                    <Text style={styles.name}>{user.fullName}</Text>
+                    <Text style={styles.tel}>{user.phoneNumber}</Text>
                   </View>
                   <View style={[styles.boxCol, styles.boxColFlex]}>
                     <TouchableOpacity style={styles.buble}>
@@ -167,8 +375,7 @@ export default function Profile(props) {
                   <Container style={[styles.boxContainer, styles.statusBox]}>
                     <Text style={styles.aboutTitle}>About</Text>
                     <Text style={styles.aboutText}>
-                      Magical: you leave one person, and you return completely
-                      different
+                      {user.about ? user.about : '-'}
                     </Text>
                   </Container>
                 </View>
@@ -245,7 +452,8 @@ export default function Profile(props) {
                       <Text style={styles.textList}>Delete Account</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[styles.list, styles.removeMargin]}>
+                      style={[styles.list, styles.removeMargin]}
+                      onPress={logout}>
                       <View style={[styles.buble]}>
                         <Icon name="log-out" color="white" size={18} />
                       </View>
@@ -340,6 +548,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'black',
     marginBottom: 5,
+    width: 160,
   },
   tel: {
     fontFamily: 'Geometria-Regular',

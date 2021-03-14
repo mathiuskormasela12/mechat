@@ -2,6 +2,10 @@
 // import all modules
 import React, {Component, Fragment} from 'react';
 import {View, Text, ScrollView, StyleSheet, Dimensions} from 'react-native';
+import {showMessage} from 'react-native-flash-message';
+import http from '../services/Services';
+import formData from '../helpers/formData';
+import {connect} from 'react-redux';
 
 // import all components
 import {
@@ -31,50 +35,56 @@ class Auth extends Component {
     this.handleInput = this.handleInput.bind(this);
   }
 
+  componentDidMount() {
+    if (this.props.token) {
+      this.props.navigation.navigate('Home');
+    }
+  }
+
   handleInput(name, value) {
     const email = value.match(/[^@$a-z0-9.]/gi);
-    this.setState((currentState) => {
-      if (name === 'phoneNumber') {
-        if (!value) {
-          this.setState({
-            messagePhone: "Phone number can't be empty",
-            typePhone: 'warning',
-          });
-        } else if (value.match(/[^0-9]/gi) !== null || value.length < 11) {
-          this.setState({
-            messagePhone: 'Invalid Phone Number',
-            typePhone: 'warning',
-          });
-        } else {
-          this.setState({
-            messagePhone: null,
-            typePhone: null,
-          });
-        }
-      } else if (name === 'email') {
-        if (!value) {
-          this.setState({
-            messageEmail: "Phone number can't be empty",
-            typeEmail: 'warning',
-          });
-        } else if (
-          email ||
-          !value.match(/@\b/g) ||
-          value.match(/\s/) ||
-          value.match(/\b[0-9]/) ||
-          !value.split('@').pop().includes('.')
-        ) {
-          this.setState({
-            messageEmail: 'Invalid Email',
-            typeEmail: 'warning',
-          });
-        } else {
-          this.setState({
-            messageEmail: null,
-            typeEmail: null,
-          });
-        }
+    if (name === 'phoneNumber') {
+      if (!value) {
+        this.setState({
+          messagePhone: "Phone number can't be empty",
+          typePhone: 'warning',
+        });
+      } else if (value.match(/[^0-9]/gi) !== null || value.length < 11) {
+        this.setState({
+          messagePhone: 'Invalid Phone Number',
+          typePhone: 'warning',
+        });
+      } else {
+        this.setState({
+          messagePhone: null,
+          typePhone: null,
+        });
       }
+    } else if (name === 'email') {
+      if (!value) {
+        this.setState({
+          messageEmail: "Email can't be empty",
+          typeEmail: 'warning',
+        });
+      } else if (
+        email ||
+        !value.match(/@\b/g) ||
+        value.match(/\s/) ||
+        value.match(/\b[0-9]/) ||
+        !value.split('@').pop().includes('.')
+      ) {
+        this.setState({
+          messageEmail: 'Invalid Email',
+          typeEmail: 'warning',
+        });
+      } else {
+        this.setState({
+          messageEmail: null,
+          typeEmail: null,
+        });
+      }
+    }
+    this.setState((currentState) => {
       return {
         ...currentState,
         [name]: value,
@@ -82,16 +92,54 @@ class Auth extends Component {
     });
   }
 
-  handleSubmit() {
+  async handleSubmit() {
     this.setState((state) => ({
       loading: !state.loading,
     }));
-    setTimeout(() => {
-      this.setState((state) => ({
-        loading: !state.loading,
+    try {
+      const form = formData('URLSearchParams', {
+        phoneNumber: `0${this.state.phoneNumber}`,
+        email: this.state.email,
+      });
+      const {data} = await http.auth(form);
+
+      if (data.success) {
+        this.setState((currentState) => ({
+          ...currentState,
+          loading: !currentState.loading,
+        }));
+        showMessage({
+          message: 'Please check your email',
+          type: 'success',
+          duration: 2000,
+          hideOnPress: true,
+        });
+        this.props.navigation.navigate('Email Code', {id: data.results.id});
+      } else {
+        this.setState((currentState) => ({
+          ...currentState,
+          loading: !currentState.loading,
+        }));
+        showMessage({
+          message: data.message,
+          type: 'warning',
+          duration: 2000,
+          hideOnPress: true,
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      this.setState((currentState) => ({
+        ...currentState,
+        loading: !currentState.loading,
       }));
-      this.props.navigation.navigate('Email Code');
-    }, 2000);
+      showMessage({
+        message: err.response.data.message,
+        type: 'warning',
+        duration: 2000,
+        hideOnPress: true,
+      });
+    }
   }
 
   render() {
@@ -162,7 +210,11 @@ class Auth extends Component {
   }
 }
 
-export default Auth;
+const mapStateToProps = (states) => ({
+  token: states.auth.token,
+});
+
+export default connect(mapStateToProps, null)(Auth);
 
 const styles = StyleSheet.create({
   hero: {

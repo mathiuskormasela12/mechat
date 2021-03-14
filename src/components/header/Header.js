@@ -1,6 +1,6 @@
 // ===== Header
 // import all modules
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -11,16 +11,49 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-// import all assets
-import profile from '../../assets/img/profile.png';
+import jwtdecode from 'jwt-decode';
+import {useDispatch, useSelector} from 'react-redux';
+import http from '../../services/Services';
+import io from '../../helpers/socket';
 
 export function Header() {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const token = useSelector((current) => current.auth.token);
+  const user = useSelector((current) => current.user);
   const [showSearchBar, setShowSearchBar] = useState(false);
 
   const handleShowSearchBar = () =>
     setShowSearchBar((currentState) => !currentState);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const {data} = await http.getUserById(token, jwtdecode(token).id);
+        dispatch({
+          type: 'SET_USER_PROFILE',
+          payload: {
+            fullName: data.results.full_name,
+            picture: data.results.picture,
+            phoneNumber: data.results.phone_number,
+            about: data.results.about,
+            email: data.results.email,
+          },
+        });
+      } catch (err) {
+        console.log(err.response.data.message);
+      }
+    };
+    if (token) {
+      fetchData();
+      io.onAny(() => {
+        io.once('Update_Profile', (msg) => {
+          console.log(msg);
+          fetchData();
+        });
+      });
+    }
+  }, [token, dispatch]);
 
   const goToProfile = () => navigation.navigate('Profile');
 
@@ -40,7 +73,12 @@ export function Header() {
               </View>
               <View style={styles.secondColoumn}>
                 <TouchableOpacity onPress={goToProfile}>
-                  <Image source={profile} style={styles.img} />
+                  <Image
+                    source={{
+                      uri: user.picture,
+                    }}
+                    style={styles.img}
+                  />
                 </TouchableOpacity>
               </View>
             </Fragment>
@@ -90,9 +128,10 @@ const styles = StyleSheet.create({
     color: '#14142B',
   },
   img: {
-    resizeMode: 'contain',
+    resizeMode: 'cover',
     height: 40,
     width: 40,
+    borderRadius: 40,
   },
   firstColoumn: {
     flex: 1,

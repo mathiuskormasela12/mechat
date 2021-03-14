@@ -12,6 +12,7 @@ export function TextField(props) {
         placeholderTextColor="#C5C5C5"
         keyboardType={props.type}
         onChangeText={props.onChangeText}
+        value={props.value}
       />
     </Fragment>
   );

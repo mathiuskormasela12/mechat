@@ -12,6 +12,13 @@ const authReducer = (state = initialState, action) => {
       };
     }
 
+    case 'LOGOUT': {
+      return {
+        ...state,
+        token: null,
+      };
+    }
+
     default: {
       return {
         ...state,

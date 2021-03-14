@@ -2,6 +2,9 @@
 // import all modules
 import React, {Component, Fragment} from 'react';
 import {View, Text, ScrollView, StyleSheet, Dimensions} from 'react-native';
+import {showMessage} from 'react-native-flash-message';
+import http from '../services/Services';
+import formData from '../helpers/formData';
 
 // import all components
 import {
@@ -18,15 +21,75 @@ class EmailCode extends Component {
     super();
     this.state = {
       loading: false,
+      fullName: null,
+      message: null,
+      type: null,
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleInput = this.handleInput.bind(this);
   }
 
-  handleSubmit() {
+  handleInput(value) {
+    this.setState((currentState) => {
+      if (value === '') {
+        this.setState({
+          message: "Full Name can't be empty",
+          type: 'warning',
+        });
+      }
+      return {
+        ...currentState,
+        fullName: value,
+      };
+    });
+  }
+
+  async handleSubmit() {
+    const {id} = this.props.route.params;
     this.setState((state) => ({
       loading: !state.loading,
     }));
+    try {
+      const form = formData('URLSearchParams', {
+        fullName: this.state.fullName,
+      });
+
+      const {data} = await http.editFullName(id, form);
+
+      if (!data.success) {
+        showMessage({
+          message: data.message,
+          type: 'warning',
+          duration: 2000,
+          hideOnPress: true,
+        });
+      } else {
+        this.setState((currentState) => ({
+          ...currentState,
+          loading: !currentState.loading,
+        }));
+        showMessage({
+          message: 'Success to edit full name',
+          type: 'success',
+          duration: 2000,
+          hideOnPress: true,
+        });
+        this.props.navigation.navigate('Home');
+      }
+    } catch (err) {
+      console.log(err);
+      this.setState((currentState) => ({
+        ...currentState,
+        loading: !currentState.loading,
+      }));
+      showMessage({
+        message: err.response.data.message,
+        type: 'warning',
+        duration: 2000,
+        hideOnPress: true,
+      });
+    }
   }
 
   render() {
@@ -45,15 +108,24 @@ class EmailCode extends Component {
                     <TextField
                       placeholder="Type Your Full Name..."
                       type="default"
+                      onChangeText={this.handleInput}
                     />
-                    <View style={styles.alert}>
-                      <Alert type="danger">Server</Alert>
-                    </View>
+                    {this.state.message && (
+                      <View style={styles.alert}>
+                        <Alert type={this.state.type}>
+                          {this.state.message}
+                        </Alert>
+                      </View>
+                    )}
                   </View>
                 </View>
                 <View style={styles.control}>
                   {this.state.loading ? (
                     <MiniLoading />
+                  ) : this.state.message ? (
+                    <Button onPress={this.handleSubmit} disabled={true}>
+                      Done
+                    </Button>
                   ) : (
                     <Button onPress={this.handleSubmit}>Done</Button>
                   )}
