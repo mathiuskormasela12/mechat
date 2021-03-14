@@ -28,11 +28,6 @@ export default function StackScreen() {
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{header: () => <Header />}}
-          />
-          <Stack.Screen
             name="Auth"
             component={Auth}
             options={{headerShown: false}}
@@ -46,6 +41,11 @@ export default function StackScreen() {
             name="Full Name"
             component={FullName}
             options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Home"
+            component={Home}
+            options={{header: () => <Header />}}
           />
           <Stack.Screen
             name="Chat Room"

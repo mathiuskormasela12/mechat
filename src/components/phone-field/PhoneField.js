@@ -19,6 +19,7 @@ export function PhoneField(props) {
           placeholder="Type Your Number...."
           placeholderTextColor="#C5C5C5"
           keyboardType="phone-pad"
+          onChangeText={props.onChangeText}
         />
       </View>
     </Fragment>

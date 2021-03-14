@@ -19,9 +19,67 @@ class Auth extends Component {
     super();
     this.state = {
       loading: false,
+      phoneNumber: null,
+      email: null,
+      messageEmail: "Email can't be empty",
+      typeEmail: 'warning',
+      messagePhone: "Phone number can't be empty",
+      typePhone: 'warning',
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleInput = this.handleInput.bind(this);
+  }
+
+  handleInput(name, value) {
+    const email = value.match(/[^@$a-z0-9.]/gi);
+    this.setState((currentState) => {
+      if (name === 'phoneNumber') {
+        if (!value) {
+          this.setState({
+            messagePhone: "Phone number can't be empty",
+            typePhone: 'warning',
+          });
+        } else if (value.match(/[^0-9]/gi) !== null || value.length < 11) {
+          this.setState({
+            messagePhone: 'Invalid Phone Number',
+            typePhone: 'warning',
+          });
+        } else {
+          this.setState({
+            messagePhone: null,
+            typePhone: null,
+          });
+        }
+      } else if (name === 'email') {
+        if (!value) {
+          this.setState({
+            messageEmail: "Phone number can't be empty",
+            typeEmail: 'warning',
+          });
+        } else if (
+          email ||
+          !value.match(/@\b/g) ||
+          value.match(/\s/) ||
+          value.match(/\b[0-9]/) ||
+          !value.split('@').pop().includes('.')
+        ) {
+          this.setState({
+            messageEmail: 'Invalid Email',
+            typeEmail: 'warning',
+          });
+        } else {
+          this.setState({
+            messageEmail: null,
+            typeEmail: null,
+          });
+        }
+      }
+      return {
+        ...currentState,
+        [name]: value,
+      };
+    });
   }
 
   handleSubmit() {
@@ -49,10 +107,17 @@ class Auth extends Component {
                 <View style={styles.control}>
                   <Text style={styles.label}>Phone Number</Text>
                   <View style={styles.field}>
-                    <PhoneField />
-                    {/* <View style={styles.alert}>
-                      <Alert type="danger">Ini Pesan</Alert>
-                    </View> */}
+                    <PhoneField
+                      value={this.state.phoneNumber}
+                      onChangeText={(e) => this.handleInput('phoneNumber', e)}
+                    />
+                    {this.state.messagePhone && (
+                      <View style={styles.alert}>
+                        <Alert type={this.state.typePhone}>
+                          {this.state.messagePhone}
+                        </Alert>
+                      </View>
+                    )}
                   </View>
                 </View>
                 <View style={styles.control}>
@@ -61,17 +126,27 @@ class Auth extends Component {
                     <TextField
                       placeholder="Type Your Email..."
                       type="email-address"
+                      value={this.state.email}
+                      onChangeText={(e) => this.handleInput('email', e)}
                     />
-                    {/* <View style={styles.alert}>
-                      <Alert type="warning">Ini Pesan</Alert>
-                    </View> */}
+                    {this.state.messageEmail && (
+                      <View style={styles.alert}>
+                        <Alert type={this.state.typeEmail}>
+                          {this.state.messageEmail}
+                        </Alert>
+                      </View>
+                    )}
                   </View>
                 </View>
                 <View style={styles.controlBtn}>
                   {this.state.loading ? (
                     <MiniLoading />
-                  ) : (
+                  ) : !this.state.messageEmail && !this.state.messagePhone ? (
                     <Button onPress={this.handleSubmit}>Send</Button>
+                  ) : (
+                    <Button onPress={this.handleSubmit} disabled={true}>
+                      Send
+                    </Button>
                   )}
                 </View>
                 <Text style={styles.text}>
