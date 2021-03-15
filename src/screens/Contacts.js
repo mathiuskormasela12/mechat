@@ -12,6 +12,9 @@ import {
   Text,
   Dimensions,
 } from 'react-native';
+import http from '../services/Services';
+import formData from '../helpers/formData';
+import {showMessage} from 'react-native-flash-message';
 
 // import all components
 import {
@@ -65,9 +68,17 @@ class Contacts extends Component {
         },
       ],
       isVisible: false,
+      contactName: null,
+      phoneNumber: null,
+      messageContact: "Contact name can't be empty",
+      typeContact: 'warning',
+      messagePhone: "Phone number can't be empty",
+      typePhone: 'warning',
     };
 
     this.handleShowWrapper = this.handleShowWrapper.bind(this);
+    this.handleInput = this.handleInput.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleShowWrapper() {
@@ -75,6 +86,76 @@ class Contacts extends Component {
     this.setState((currentState) => ({
       isVisible: !currentState.isVisible,
     }));
+  }
+
+  handleInput(name, value) {
+    if (name === 'contactName') {
+      if (value === '' || !value) {
+        this.setState({
+          messageContact: "Contact name can't be empty",
+          typeContact: 'warning',
+        });
+      } else {
+        this.setState({
+          messageContact: null,
+          typeContact: null,
+        });
+      }
+    } else {
+      if (value === '' || !value) {
+        this.setState({
+          messagePhone: "Phone number can't be empty",
+          typePhone: 'warning',
+        });
+      } else if (value.match(/[^0-9]/gi) !== null || value.length < 11) {
+        this.setState({
+          messagePhone: 'Invalid phone number',
+          typePhone: 'warning',
+        });
+      } else {
+        this.setState({
+          messagePhone: null,
+          typePhone: null,
+        });
+      }
+    }
+    this.setState({
+      [name]: value,
+    });
+  }
+
+  async handleSubmit() {
+    const form = formData('URLSearchParams', {
+      contactName: this.state.contactName,
+      phoneNumber: this.state.phoneNumber,
+    });
+    this.handleShowWrapper();
+    try {
+      const {data} = await http.createContact(this.props.auth.token, form);
+      if (data.success) {
+        showMessage({
+          message: data.message,
+          type: 'success',
+          duration: 2000,
+          hideOnPress: true,
+        });
+      } else {
+        showMessage({
+          message: data.message,
+          type: 'warning',
+          duration: 2000,
+          hideOnPress: true,
+        });
+      }
+    } catch (err) {
+      console.log(err.response);
+      showMessage({
+        message: err.response.data.message,
+        type: 'warning',
+        duration: 2000,
+        hideOnPress: true,
+      });
+    }
   }
 
   render() {
@@ -95,12 +176,17 @@ class Contacts extends Component {
                         <ModalInput
                           placeholder="Type Your Contact Name..."
                           type="default"
+                          onChangeText={(event) =>
+                            this.handleInput('contactName', event)
+                          }
                         />
-                        <View style={styles.alert}>
-                          <Alert type="danger" md>
-                            Contact Name Can't be empy
-                          </Alert>
-                        </View>
+                        {this.state.messageContact && (
+                          <View style={styles.alert}>
+                            <Alert type={this.state.typeContact} md>
+                              {this.state.messageContact}
+                            </Alert>
+                          </View>
+                        )}
                       </View>
                     </View>
                     <View style={styles.controlZero}>
@@ -109,17 +195,29 @@ class Contacts extends Component {
                         <ModalInput
                           placeholder="Type Your Contact Name..."
                           type="number-pad"
+                          onChangeText={(event) =>
+                            this.handleInput('phoneNumber', event)
+                          }
                         />
-                        <View style={styles.alert}>
-                          <Alert type="warning" md>
-                            Invalid Phone Number
-                          </Alert>
-                        </View>
+                        {this.state.messagePhone && (
+                          <View style={styles.alert}>
+                            <Alert type={this.state.typePhone} md>
+                              {this.state.messagePhone}
+                            </Alert>
+                          </View>
+                        )}
                       </View>
                     </View>
                     <View style={styles.controlBtn}>
                       <View style={styles.btnCol}>
-                        <ModalButton>Save</ModalButton>
+                        {this.state.messageContact ||
+                        this.state.messagePhone ? (
+                          <ModalButton disabled={true}>Save</ModalButton>
+                        ) : (
+                          <ModalButton onPress={this.handleSubmit}>
+                            Save
+                          </ModalButton>
+                        )}
                       </View>
                       <View style={styles.btnCol}>
                         <ModalButton onPress={this.handleShowWrapper}>
@@ -157,6 +255,9 @@ class Contacts extends Component {
 const mapStateToProps = (state) => ({
   loading: {
     ...state.loading,
+  },
+  auth: {
+    ...state.auth,
   },
 });
 

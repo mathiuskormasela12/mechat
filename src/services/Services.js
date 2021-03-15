@@ -40,6 +40,10 @@ class Services {
   editEmail(token, id, data) {
     return http(token).put(`/user/email/${id}`, data);
   }
+
+  createContact(token, data) {
+    return http(token).post('/contact', data);
+  }
 }
 
 export default new Services();
