@@ -232,7 +232,7 @@ export default function Profile(props) {
 
   const handleSubmit = async () => {
     const form = formData('URLSearchParams', {
-      [state.name]: state.value,
+      [state.name]: escape(state.value),
     });
     if (state.name === 'about') {
       try {
@@ -266,6 +266,32 @@ export default function Profile(props) {
         console.log(err);
         handleShowWrapper(null, null, null, null);
       }
+    } else if (state.name === 'status') {
+      try {
+        await http.editStatus(token, jwtdecode(token).id, form);
+        handleShowWrapper(null, null, null, null);
+      } catch (err) {
+        console.log(err);
+        handleShowWrapper(null, null, null, null);
+      }
+    }
+  };
+
+  const deleteAccount = async () => {
+    try {
+      await http.deleteAccount(token, jwtdecode(token).id);
+      dispatch({
+        type: 'LOGOUT',
+      });
+      navigation.navigate('Auth');
+    } catch (err) {
+      console.log(err);
+      showMessage({
+        message: err.response.data.message,
+        type: 'warning',
+        duration: 2000,
+        hideOnPress: true,
+      });
     }
   };
 
@@ -303,7 +329,13 @@ export default function Profile(props) {
                 </View>
                 <View style={styles.controlBtn}>
                   <View style={styles.btnCol}>
-                    <ModalButton onPress={handleSubmit}>Save</ModalButton>
+                    {state.message ? (
+                      <ModalButton onPress={handleSubmit} disabled={true}>
+                        Save
+                      </ModalButton>
+                    ) : (
+                      <ModalButton onPress={handleSubmit}>Save</ModalButton>
+                    )}
                   </View>
                   <View style={styles.btnCol}>
                     <ModalButton
@@ -375,7 +407,12 @@ export default function Profile(props) {
                   <Container style={[styles.boxContainer, styles.statusBox]}>
                     <Text style={styles.aboutTitle}>About</Text>
                     <Text style={styles.aboutText}>
-                      {user.about ? user.about : '-'}
+                      {user.about &&
+                      user.about !== 'null' &&
+                      user.about !== '' &&
+                      user.about !== 'undefined'
+                        ? user.about
+                        : '-'}
                     </Text>
                   </Container>
                 </View>
@@ -445,7 +482,24 @@ export default function Profile(props) {
                       </View>
                       <Text style={styles.textList}>Edit Your Email</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.list}>
+                    <TouchableOpacity
+                      style={styles.list}
+                      onPress={() =>
+                        handleShowWrapper(
+                          'Type Your Status...',
+                          'status',
+                          'Status',
+                          'default',
+                        )
+                      }>
+                      <View style={[styles.buble]}>
+                        <Icon name="star" color="white" size={18} />
+                      </View>
+                      <Text style={styles.textList}>Edit Your Status</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.list}
+                      onPress={deleteAccount}>
                       <View style={[styles.buble]}>
                         <Icon name="trash" color="white" size={18} />
                       </View>

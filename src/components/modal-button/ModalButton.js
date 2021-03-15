@@ -5,7 +5,10 @@ import {TouchableOpacity, Text, StyleSheet} from 'react-native';
 export function ModalButton(props) {
   return (
     <Fragment>
-      <TouchableOpacity style={styles.button} onPress={props.onPress}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={props.onPress}
+        {...props}>
         <Text style={styles.text}>{props.children}</Text>
       </TouchableOpacity>
     </Fragment>

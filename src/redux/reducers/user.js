@@ -5,6 +5,7 @@ const initialState = {
   about: null,
   fullName: null,
   email: null,
+  status: null,
 };
 
 const userReducer = (state = initialState, action) => {
@@ -15,8 +16,13 @@ const userReducer = (state = initialState, action) => {
         picture: action.payload.picture,
         fullName: action.payload.fullName,
         phoneNumber: action.payload.phoneNumber,
-        about: action.payload.about,
+        about:
+          action.payload.about !== 'null' &&
+          action.payload.about !== 'undefined'
+            ? action.payload.about
+            : null,
         email: action.payload.email,
+        status: action.payload.status,
       };
     }
 

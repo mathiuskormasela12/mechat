@@ -25,6 +25,14 @@ class Services {
     return http(token).put(`/user/about/${id}`, data);
   }
 
+  editStatus(token, id, data) {
+    return http(token).put(`/user/status/${id}`, data);
+  }
+
+  deleteAccount(token, id) {
+    return http(token).delete(`/user/${id}`);
+  }
+
   editPhone(token, id, data) {
     return http(token).put(`/user/phonenumber/${id}`, data);
   }

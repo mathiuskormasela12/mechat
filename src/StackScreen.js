@@ -34,36 +34,73 @@ export default function StackScreen() {
     <Fragment>
       <NavigationContainer>
         <Stack.Navigator>
-          <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{header: () => (token ? <Header /> : <Auth />)}}
-          />
-          <Stack.Screen
-            name="Auth"
-            component={Auth}
-            options={{headerShown: false}}
-          />
-          <Stack.Screen
-            name="Email Code"
-            component={EmailCode}
-            options={{headerShown: false}}
-          />
-          <Stack.Screen
-            name="Full Name"
-            component={FullName}
-            options={{headerShown: false}}
-          />
-          <Stack.Screen
-            name="Chat Room"
-            component={ChatRoom}
-            options={{header: () => <HeaderChat />}}
-          />
-          <Stack.Screen
-            name="Profile"
-            component={Profile}
-            options={{headerShown: false}}
-          />
+          {token ? (
+            <Fragment>
+              <Stack.Screen
+                name="Home"
+                component={Home}
+                options={{header: () => <Header />}}
+              />
+              <Stack.Screen
+                name="Chat Room"
+                component={ChatRoom}
+                options={{header: () => <HeaderChat />}}
+              />
+              <Stack.Screen
+                name="Profile"
+                component={Profile}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="Auth"
+                component={Auth}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="Email Code"
+                component={EmailCode}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="Full Name"
+                component={FullName}
+                options={{headerShown: false}}
+              />
+            </Fragment>
+          ) : (
+            <Fragment>
+              <Stack.Screen
+                name="Auth"
+                component={Auth}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="Home"
+                component={Home}
+                options={{header: () => <Header />}}
+              />
+              <Stack.Screen
+                name="Chat Room"
+                component={ChatRoom}
+                options={{header: () => <HeaderChat />}}
+              />
+              <Stack.Screen
+                name="Profile"
+                component={Profile}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="Email Code"
+                component={EmailCode}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="Full Name"
+                component={FullName}
+                options={{headerShown: false}}
+              />
+            </Fragment>
+          )}
         </Stack.Navigator>
       </NavigationContainer>
       {showWrapper && <Wrapper />}

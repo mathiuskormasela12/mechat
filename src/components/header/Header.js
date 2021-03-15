@@ -38,6 +38,7 @@ export function Header() {
             phoneNumber: data.results.phone_number,
             about: data.results.about,
             email: data.results.email,
+            status: data.results.status,
           },
         });
       } catch (err) {
@@ -47,7 +48,7 @@ export function Header() {
     if (token) {
       fetchData();
       io.onAny(() => {
-        io.once('Update_Profile', (msg) => {
+        io.once(`Update_Profile_${jwtdecode(token).id}`, (msg) => {
           console.log(msg);
           fetchData();
         });

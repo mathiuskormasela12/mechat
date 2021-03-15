@@ -114,7 +114,13 @@ class Auth extends Component {
           duration: 2000,
           hideOnPress: true,
         });
-        this.props.navigation.navigate('Email Code', {id: data.results.id});
+        setTimeout(() => {
+          this.setState({
+            phoneNumber: null,
+            email: null,
+          });
+          this.props.navigation.navigate('Email Code', {id: data.results.id});
+        }, 2000);
       } else {
         this.setState((currentState) => ({
           ...currentState,

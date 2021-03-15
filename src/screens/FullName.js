@@ -5,6 +5,10 @@ import {View, Text, ScrollView, StyleSheet, Dimensions} from 'react-native';
 import {showMessage} from 'react-native-flash-message';
 import http from '../services/Services';
 import formData from '../helpers/formData';
+import {connect} from 'react-redux';
+
+// import all actions
+import {setToken} from '../redux/actions/auth';
 
 // import all components
 import {
@@ -16,7 +20,7 @@ import {
   Alert,
 } from '../components';
 
-class EmailCode extends Component {
+class FullName extends Component {
   constructor() {
     super();
     this.state = {
@@ -31,13 +35,18 @@ class EmailCode extends Component {
   }
 
   handleInput(value) {
+    if (value === '') {
+      this.setState({
+        message: "Full Name can't be empty",
+        type: 'warning',
+      });
+    } else {
+      this.setState({
+        message: null,
+        type: null,
+      });
+    }
     this.setState((currentState) => {
-      if (value === '') {
-        this.setState({
-          message: "Full Name can't be empty",
-          type: 'warning',
-        });
-      }
       return {
         ...currentState,
         fullName: value,
@@ -46,7 +55,7 @@ class EmailCode extends Component {
   }
 
   async handleSubmit() {
-    const {id} = this.props.route.params;
+    const {id, token} = this.props.route.params;
     this.setState((state) => ({
       loading: !state.loading,
     }));
@@ -67,15 +76,19 @@ class EmailCode extends Component {
       } else {
         this.setState((currentState) => ({
           ...currentState,
+          fullName: null,
           loading: !currentState.loading,
         }));
+        this.props.setToken(token);
         showMessage({
           message: 'Success to edit full name',
           type: 'success',
           duration: 2000,
           hideOnPress: true,
         });
-        this.props.navigation.navigate('Home');
+        setTimeout(() => {
+          this.props.navigation.navigate('Home');
+        }, 2000);
       }
     } catch (err) {
       console.log(err);
@@ -109,6 +122,7 @@ class EmailCode extends Component {
                       placeholder="Type Your Full Name..."
                       type="default"
                       onChangeText={this.handleInput}
+                      value={this.state.fullName}
                     />
                     {this.state.message && (
                       <View style={styles.alert}>
@@ -143,7 +157,11 @@ class EmailCode extends Component {
   }
 }
 
-export default EmailCode;
+const mapDispatchToProps = {
+  setToken,
+};
+
+export default connect(null, mapDispatchToProps)(FullName);
 
 const styles = StyleSheet.create({
   hero: {

@@ -87,14 +87,26 @@ class EmailCode extends Component {
           ...currentState,
           loading: !currentState.loading,
         }));
-        this.props.setToken(data.results.token);
+        this.setState({
+          otp: null,
+        });
         showMessage({
-          message: 'Succes to verify otp code',
+          message: 'Success to verify otp code',
           type: 'success',
           duration: 2000,
           hideOnPress: true,
         });
-        this.props.navigation.navigate('Full Name', {id});
+        setTimeout(() => {
+          if (data.results.fullName === '' || !data.results.fullName) {
+            this.props.navigation.navigate('Full Name', {
+              id,
+              token: data.results.token,
+            });
+          } else {
+            this.props.setToken(data.results.token);
+            this.props.navigation.navigate('Home');
+          }
+        }, 2000);
       }
     } catch (err) {
       console.log(err);
