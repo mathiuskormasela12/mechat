@@ -15,6 +15,8 @@ import {
 import http from '../services/Services';
 import formData from '../helpers/formData';
 import {showMessage} from 'react-native-flash-message';
+import io from '../helpers/socket';
+import jwtdecode from 'jwt-decode';
 
 // import all components
 import {
@@ -22,6 +24,7 @@ import {
   ModalInput,
   Container,
   ModalButton,
+  MiniLoading,
   Alert,
 } from '../components';
 
@@ -31,42 +34,12 @@ import Icon from 'react-native-vector-icons/Ionicons';
 // import all actions
 import {showWrapper} from '../redux/actions/loading';
 
-import profile from '../assets/img/profile.png';
-
 class Contacts extends Component {
   constructor() {
     super();
     this.state = {
-      contacts: [
-        {
-          name: 'Nayeon',
-          status: 'Available',
-        },
-        {
-          name: 'Mina',
-          status: 'Avaliable',
-        },
-        {
-          name: 'Sana',
-          status: 'Busy',
-        },
-        {
-          name: 'Tzuyu',
-          status: 'Listening Music',
-        },
-        {
-          name: 'Momo',
-          status: 'Busy',
-        },
-        {
-          name: 'Jihyo',
-          status: 'Busy',
-        },
-        {
-          name: 'Dahyun',
-          status: 'Busy',
-        },
-      ],
+      contacts: [],
+      loading: false,
       isVisible: false,
       contactName: null,
       phoneNumber: null,
@@ -74,6 +47,7 @@ class Contacts extends Component {
       typeContact: 'warning',
       messagePhone: "Phone number can't be empty",
       typePhone: 'warning',
+      message: null,
     };
 
     this.handleShowWrapper = this.handleShowWrapper.bind(this);
@@ -158,6 +132,43 @@ class Contacts extends Component {
     }
   }
 
+  componentDidMount() {
+    this.fetchData();
+    io.onAny(() => {
+      io.once(
+        `Update_Contact_${jwtdecode(this.props.auth.token).id}`,
+        (msg) => {
+          console.log(msg);
+          this.fetchData();
+        },
+      );
+    });
+  }
+
+  fetchData = async () => {
+    this.setState((currentState) => ({
+      loading: !currentState.loading,
+    }));
+    try {
+      const {data} = await http.getContactList(this.props.auth.token, {
+        page: 1,
+        sort: 'ASC',
+        by: 'contact_name',
+        keyword: '',
+      });
+      this.setState((currentState) => ({
+        loading: !currentState.loading,
+        contacts: data.results,
+      }));
+    } catch (err) {
+      console.log(err);
+      this.setState((currentState) => ({
+        loading: !currentState.loading,
+        message: err.response.data.message,
+      }));
+    }
+  };
+
   render() {
     return (
       <Fragment>
@@ -230,17 +241,29 @@ class Contacts extends Component {
               </ScrollView>
             </View>
           </Modal>
-          <FlatList
-            data={this.state.contacts}
-            keyExtractor={(item, index) => String(index)}
-            renderItem={({item}) => (
-              <ContactList
-                picture={profile}
-                name={item.name}
-                status={item.status}
-              />
-            )}
-          />
+          {this.state.loading ? (
+            <View style={styles.flexbox}>
+              <MiniLoading />
+            </View>
+          ) : this.state.contacts.length > 0 ? (
+            <FlatList
+              data={this.state.contacts}
+              keyExtractor={(item, index) => String(index)}
+              renderItem={({item}) => (
+                <ContactList
+                  picture={{
+                    uri: item.picture,
+                  }}
+                  name={item.contact_name}
+                  status={item.status}
+                />
+              )}
+            />
+          ) : (
+            <View style={styles.flexbox}>
+              <Text style={styles.flexText}>{this.state.message}</Text>
+            </View>
+          )}
           <TouchableOpacity
             style={styles.contact}
             onPress={this.handleShowWrapper}>
@@ -327,5 +350,15 @@ const styles = StyleSheet.create({
   },
   alert: {
     marginTop: 12,
+  },
+  flexbox: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  flexText: {
+    fontFamily: 'ProximaNova-Regular',
+    fontSize: 16,
+    color: '#14142B',
   },
 });

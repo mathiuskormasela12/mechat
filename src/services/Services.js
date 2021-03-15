@@ -44,6 +44,12 @@ class Services {
   createContact(token, data) {
     return http(token).post('/contact', data);
   }
+
+  getContactList(token, data) {
+    return http(token).get(
+      `/contact?page=${data.page}&sort=${data.sort}&by=${data.by}&search=${data.keyword}`,
+    );
+  }
 }
 
 export default new Services();

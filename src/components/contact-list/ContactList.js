@@ -23,9 +23,10 @@ export function ContactList(props) {
 
 const styles = StyleSheet.create({
   img: {
-    resizeMode: 'contain',
+    resizeMode: 'cover',
     height: 50,
     width: 50,
+    borderRadius: 50,
   },
   card: {
     width: '100%',
@@ -58,5 +59,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Geometria',
     fontWeight: 'normal',
     fontSize: 15,
+    textTransform: 'capitalize',
   },
 });
