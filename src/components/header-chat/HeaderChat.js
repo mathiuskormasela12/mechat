@@ -11,18 +11,26 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useDispatch, useSelector} from 'react-redux';
+
+// import all actions
+import {sort, search} from '../../redux/actions/search';
 
 // import all assets
 import profile from '../../assets/img/profile.png';
 
 export function HeaderChat() {
   const [showSearchBar, setShowSearchBar] = useState(false);
+  const dispatch = useDispatch();
   const navigation = useNavigation();
+  const {isASC: isAsc} = useSelector((current) => current.search);
 
   const handleShowSearchBar = () =>
     setShowSearchBar((currentState) => !currentState);
 
   const back = () => navigation.navigate('Home');
+  const handleAsc = () => dispatch(sort());
+  const handleSearch = (value) => dispatch(search(value));
 
   return (
     <Fragment>
@@ -34,13 +42,16 @@ export function HeaderChat() {
                 <TouchableOpacity onPress={back}>
                   <Icon name="arrow-back-outline" color="#BEBEBE" size={25} />
                 </TouchableOpacity>
+                <TouchableOpacity>
+                  <Image source={profile} style={styles.img} />
+                </TouchableOpacity>
               </View>
               <View style={styles.coloumn}>
                 <Text style={styles.text}>Jihyo</Text>
               </View>
               <View style={styles.secondColoumn}>
-                <TouchableOpacity>
-                  <Image source={profile} style={styles.img} />
+                <TouchableOpacity onPress={handleShowSearchBar}>
+                  <Icon name="search" color="#BEBEBE" size={25} />
                 </TouchableOpacity>
               </View>
             </Fragment>
@@ -58,7 +69,21 @@ export function HeaderChat() {
                     placeholderTextColor="#BEBEBE"
                     keyboardType="web-search"
                     style={styles.input}
+                    onChangeText={handleSearch}
                   />
+                </View>
+                <View style={styles.arrowAsc}>
+                  <TouchableOpacity onPress={handleAsc}>
+                    {isAsc ? (
+                      <Icon
+                        name="arrow-down-outline"
+                        color="#BEBEBE"
+                        size={25}
+                      />
+                    ) : (
+                      <Icon name="arrow-up-outline" color="#BEBEBE" size={25} />
+                    )}
+                  </TouchableOpacity>
                 </View>
               </View>
             </Fragment>
@@ -94,11 +119,13 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     height: 40,
     width: 40,
+    marginLeft: 10,
   },
   firstColoumn: {
-    flex: 1,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
+    flex: 2,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   secondColoumn: {
     flex: 1,
@@ -106,7 +133,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   coloumn: {
-    flex: 2,
+    flex: 3,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -125,8 +152,14 @@ const styles = StyleSheet.create({
   },
   search: {
     height: '100%',
-    width: '89%',
+    width: '79%',
     justifyContent: 'center',
+  },
+  arrowAsc: {
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    width: '10%',
   },
   input: {
     fontSize: 16,
