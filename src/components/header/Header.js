@@ -16,39 +16,47 @@ import {useDispatch, useSelector} from 'react-redux';
 import http from '../../services/Services';
 import io from '../../helpers/socket';
 
+// import all actions
+import {sort, search} from '../../redux/actions/search';
+
 export function Header() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const token = useSelector((current) => current.auth.token);
   const user = useSelector((current) => current.user);
+  const {isASC: isAsc, keyword} = useSelector((current) => current.search);
   const [showSearchBar, setShowSearchBar] = useState(false);
 
   const handleShowSearchBar = () =>
     setShowSearchBar((currentState) => !currentState);
 
+  const handleAsc = () => dispatch(sort());
+  const handleSearch = (value) => dispatch(search(value));
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const {data} = await http.getUserById(token, jwtdecode(token).id);
-        dispatch({
-          type: 'SET_USER_PROFILE',
-          payload: {
-            fullName: data.results.full_name,
-            picture: data.results.picture,
-            phoneNumber: data.results.phone_number,
-            about: data.results.about,
-            email: data.results.email,
-            status: data.results.status,
-          },
-        });
-      } catch (err) {
-        console.log(err.response.data.message);
-      }
-    };
     if (token) {
+      const decode = jwtdecode(token);
+      const fetchData = async () => {
+        try {
+          const {data} = await http.getUserById(token, decode.id);
+          dispatch({
+            type: 'SET_USER_PROFILE',
+            payload: {
+              fullName: data.results.full_name,
+              picture: data.results.picture,
+              phoneNumber: data.results.phone_number,
+              about: data.results.about,
+              email: data.results.email,
+              status: data.results.status,
+            },
+          });
+        } catch (err) {
+          console.log(err.response.data.message);
+        }
+      };
       fetchData();
       io.onAny(() => {
-        io.once(`Update_Profile_${jwtdecode(token).id}`, (msg) => {
+        io.once(`Update_Profile_${decode.id}`, (msg) => {
           console.log(msg);
           fetchData();
         });
@@ -97,7 +105,22 @@ export function Header() {
                     placeholderTextColor="#BEBEBE"
                     keyboardType="web-search"
                     style={styles.input}
+                    onChangeText={handleSearch}
+                    value={keyword}
                   />
+                </View>
+                <View style={styles.arrowAsc}>
+                  <TouchableOpacity onPress={handleAsc}>
+                    {isAsc ? (
+                      <Icon
+                        name="arrow-down-outline"
+                        color="#BEBEBE"
+                        size={25}
+                      />
+                    ) : (
+                      <Icon name="arrow-up-outline" color="#BEBEBE" size={25} />
+                    )}
+                  </TouchableOpacity>
                 </View>
               </View>
             </Fragment>
@@ -164,8 +187,14 @@ const styles = StyleSheet.create({
   },
   search: {
     height: '100%',
-    width: '89%',
+    width: '79%',
     justifyContent: 'center',
+  },
+  arrowAsc: {
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    width: '10%',
   },
   input: {
     fontSize: 16,

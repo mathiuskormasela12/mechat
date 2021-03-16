@@ -42,28 +42,8 @@ export default function StackScreen() {
                 options={{header: () => <Header />}}
               />
               <Stack.Screen
-                name="Chat Room"
-                component={ChatRoom}
-                options={{header: () => <HeaderChat />}}
-              />
-              <Stack.Screen
-                name="Profile"
-                component={Profile}
-                options={{headerShown: false}}
-              />
-              <Stack.Screen
                 name="Auth"
                 component={Auth}
-                options={{headerShown: false}}
-              />
-              <Stack.Screen
-                name="Email Code"
-                component={EmailCode}
-                options={{headerShown: false}}
-              />
-              <Stack.Screen
-                name="Full Name"
-                component={FullName}
                 options={{headerShown: false}}
               />
             </Fragment>
@@ -79,28 +59,33 @@ export default function StackScreen() {
                 component={Home}
                 options={{header: () => <Header />}}
               />
-              <Stack.Screen
-                name="Chat Room"
-                component={ChatRoom}
-                options={{header: () => <HeaderChat />}}
-              />
-              <Stack.Screen
-                name="Profile"
-                component={Profile}
-                options={{headerShown: false}}
-              />
-              <Stack.Screen
-                name="Email Code"
-                component={EmailCode}
-                options={{headerShown: false}}
-              />
-              <Stack.Screen
-                name="Full Name"
-                component={FullName}
-                options={{headerShown: false}}
-              />
             </Fragment>
           )}
+          <Stack.Screen
+            name="Chat Room"
+            component={ChatRoom}
+            options={{header: () => <HeaderChat />}}
+          />
+          <Stack.Screen
+            name="Profile"
+            component={Profile}
+            options={{headerShown: false}}
+          />
+          {/* <Stack.Screen
+            name="Auth"
+            component={Auth}
+            options={{headerShown: false}}
+          /> */}
+          <Stack.Screen
+            name="Email Code"
+            component={EmailCode}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Full Name"
+            component={FullName}
+            options={{headerShown: false}}
+          />
         </Stack.Navigator>
       </NavigationContainer>
       {showWrapper && <Wrapper />}

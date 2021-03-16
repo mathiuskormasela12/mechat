@@ -39,6 +39,7 @@ export default function Profile(props) {
     message: null,
     alertType: null,
   });
+  const decode = token ? jwtdecode(token) : null;
 
   const back = () => navigation.navigate('Home');
 
@@ -66,7 +67,7 @@ export default function Profile(props) {
                   name: response.fileName,
                 },
               });
-              await http.upload(token, jwtdecode(token).id, form);
+              await http.upload(token, decode.id, form);
             } catch (err) {
               console.log(err);
               showMessage({
@@ -106,7 +107,7 @@ export default function Profile(props) {
                   name: response.fileName,
                 },
               });
-              await http.upload(token, jwtdecode(token).id, form);
+              await http.upload(token, decode.id, form);
             } catch (err) {
               console.log(err);
               showMessage({
@@ -127,24 +128,57 @@ export default function Profile(props) {
       type: 'SET_WRAPPER',
     });
     setVisible((visible) => !visible);
-    setState((currentState) => ({
-      ...currentState,
-      placeholder,
-      name,
-      label,
-      type,
-      message: null,
-      alertType: null,
-      value: user[name],
-    }));
+    setState((currentState) => {
+      if (user[name] === '' || !user[name]) {
+        return {
+          ...currentState,
+          placeholder,
+          name,
+          label,
+          type,
+          message: `${name} can't be empty`,
+          alertType: 'warning',
+          value: user[name],
+        };
+      } else {
+        return {
+          ...currentState,
+          placeholder,
+          name,
+          label,
+          type,
+          message: null,
+          alertType: null,
+          value: user[name],
+        };
+      }
+    });
 
-    if (!state.message && !state.alertType && state.value === '') {
-      setState((c) => ({
-        ...c,
-        message: `${name} can't be empty`,
-        alertType: 'warning',
-      }));
-    }
+    // if (state.value === '') {
+    //   setState((c) => ({
+    //     ...c,
+    //     message: `${name} can't be empty`,
+    //     alertType: 'warning',
+    //   }));
+    // }
+    // setState((currentState) => ({
+    //   ...currentState,
+    //   placeholder,
+    //   name,
+    //   label,
+    //   type,
+    //   message: null,
+    //   alertType: null,
+    //   value: user[name],
+    // }));
+
+    // if (state.value === '') {
+    //   setState((c) => ({
+    //     ...c,
+    //     message: `${name} can't be empty`,
+    //     alertType: 'warning',
+    //   }));
+    // }
   };
 
   const handleInput = (value) => {
@@ -223,6 +257,20 @@ export default function Profile(props) {
           alertType: null,
         }));
       }
+    } else if (state.name === 'status') {
+      if (!value) {
+        setState((current) => ({
+          ...current,
+          message: "status can't be empty",
+          alertType: 'warning',
+        }));
+      } else {
+        setState((c) => ({
+          ...c,
+          message: null,
+          alertType: null,
+        }));
+      }
     }
     setState((currentState) => ({
       ...currentState,
@@ -236,7 +284,7 @@ export default function Profile(props) {
     });
     if (state.name === 'about') {
       try {
-        await http.editAbout(token, jwtdecode(token).id, form);
+        await http.editAbout(token, decode.id, form);
         handleShowWrapper(null, null, null, null);
       } catch (err) {
         console.log(err);
@@ -244,7 +292,7 @@ export default function Profile(props) {
       }
     } else if (state.name === 'fullName') {
       try {
-        await http.editFullName(jwtdecode(token).id, form);
+        await http.editFullName(decode.id, form);
         handleShowWrapper(null, null, null, null);
       } catch (err) {
         console.log(err);
@@ -252,7 +300,7 @@ export default function Profile(props) {
       }
     } else if (state.name === 'email') {
       try {
-        await http.editEmail(token, jwtdecode(token).id, form);
+        await http.editEmail(token, decode.id, form);
         handleShowWrapper(null, null, null, null);
       } catch (err) {
         console.log(err);
@@ -260,7 +308,7 @@ export default function Profile(props) {
       }
     } else if (state.name === 'phoneNumber') {
       try {
-        await http.editPhone(token, jwtdecode(token).id, form);
+        await http.editPhone(token, decode.id, form);
         handleShowWrapper(null, null, null, null);
       } catch (err) {
         console.log(err);
@@ -268,7 +316,7 @@ export default function Profile(props) {
       }
     } else if (state.name === 'status') {
       try {
-        await http.editStatus(token, jwtdecode(token).id, form);
+        await http.editStatus(token, decode.id, form);
         handleShowWrapper(null, null, null, null);
       } catch (err) {
         console.log(err);
@@ -279,7 +327,7 @@ export default function Profile(props) {
 
   const deleteAccount = async () => {
     try {
-      await http.deleteAccount(token, jwtdecode(token).id);
+      await http.deleteAccount(token, decode.id);
       dispatch({
         type: 'LOGOUT',
       });
@@ -318,7 +366,7 @@ export default function Profile(props) {
                       onChangeText={handleInput}
                       value={state.value}
                     />
-                    {state.message && (
+                    {(state.value === '' || !state.value || state.message) && (
                       <View style={styles.alert}>
                         <Alert type={state.alertType} md>
                           {state.message}

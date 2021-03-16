@@ -37,7 +37,7 @@ class Auth extends Component {
 
   componentDidMount() {
     if (this.props.token) {
-      this.props.navigation.navigate('Home');
+      // this.props.navigation.navigate('Home');
     }
   }
 

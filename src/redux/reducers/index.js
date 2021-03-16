@@ -8,6 +8,7 @@ import hardSet from 'redux-persist/es/stateReconciler/hardSet';
 import authReducer from './auth';
 import loadingReducer from './loading';
 import userReducer from './user';
+import searchReducer from './search';
 
 const rootPersistConfig = {
   key: 'root',
@@ -25,6 +26,7 @@ const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   loading: loadingReducer,
   user: userReducer,
+  search: searchReducer,
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);

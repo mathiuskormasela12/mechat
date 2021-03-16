@@ -113,7 +113,23 @@ class Contacts extends Component {
           duration: 2000,
           hideOnPress: true,
         });
+        this.setState({
+          contactName: null,
+          phoneNumber: null,
+          messageContact: "Contact name can't be empty",
+          typeContact: 'warning',
+          messagePhone: "Phone number can't be empty",
+          typePhone: 'warning',
+        });
       } else {
+        this.setState({
+          contactName: null,
+          phoneNumber: null,
+          messageContact: "Contact name can't be empty",
+          typeContact: 'warning',
+          messagePhone: "Phone number can't be empty",
+          typePhone: 'warning',
+        });
         showMessage({
           message: data.message,
           type: 'warning',
@@ -123,6 +139,14 @@ class Contacts extends Component {
       }
     } catch (err) {
       console.log(err.response);
+      this.setState({
+        contactName: null,
+        phoneNumber: null,
+        messageContact: "Contact name can't be empty",
+        typeContact: 'warning',
+        messagePhone: "Phone number can't be empty",
+        typePhone: 'warning',
+      });
       showMessage({
         message: err.response.data.message,
         type: 'warning',
@@ -133,16 +157,23 @@ class Contacts extends Component {
   }
 
   componentDidMount() {
+    const decode = jwtdecode(this.props.auth.token);
     this.fetchData();
     io.onAny(() => {
-      io.once(
-        `Update_Contact_${jwtdecode(this.props.auth.token).id}`,
-        (msg) => {
-          console.log(msg);
-          this.fetchData();
-        },
-      );
+      io.once(`Update_Contact_${decode.id}`, (msg) => {
+        console.log(msg);
+        this.fetchData();
+      });
     });
+  }
+
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.search.keyword !== this.props.search.keyword ||
+      prevProps.search.isASC !== this.props.search.isASC
+    ) {
+      this.fetchData();
+    }
   }
 
   fetchData = async () => {
@@ -152,9 +183,9 @@ class Contacts extends Component {
     try {
       const {data} = await http.getContactList(this.props.auth.token, {
         page: 1,
-        sort: 'ASC',
+        sort: this.props.search.isASC ? 'ASC' : 'DESC',
         by: 'contact_name',
-        keyword: '',
+        keyword: this.props.search.keyword,
       });
       this.setState((currentState) => ({
         loading: !currentState.loading,
@@ -191,7 +222,8 @@ class Contacts extends Component {
                             this.handleInput('contactName', event)
                           }
                         />
-                        {this.state.messageContact && (
+                        {(!this.state.contactName ||
+                          this.state.contactName === '') && (
                           <View style={styles.alert}>
                             <Alert type={this.state.typeContact} md>
                               {this.state.messageContact}
@@ -204,13 +236,15 @@ class Contacts extends Component {
                       <Text style={styles.label}>Phone Number</Text>
                       <View style={styles.field}>
                         <ModalInput
-                          placeholder="Type Your Contact Name..."
+                          placeholder="Type Your Phone Number..."
                           type="number-pad"
                           onChangeText={(event) =>
                             this.handleInput('phoneNumber', event)
                           }
                         />
-                        {this.state.messagePhone && (
+                        {(this.state.phoneNumber === '' ||
+                          !this.state.phoneNumber ||
+                          this.state.phoneNumber === '') && (
                           <View style={styles.alert}>
                             <Alert type={this.state.typePhone} md>
                               {this.state.messagePhone}
@@ -221,8 +255,10 @@ class Contacts extends Component {
                     </View>
                     <View style={styles.controlBtn}>
                       <View style={styles.btnCol}>
-                        {this.state.messageContact ||
-                        this.state.messagePhone ? (
+                        {!this.state.contactName ||
+                        this.state.contactName === '' ||
+                        !this.state.phoneNumber ||
+                        this.state.phoneNumber === '' ? (
                           <ModalButton disabled={true}>Save</ModalButton>
                         ) : (
                           <ModalButton onPress={this.handleSubmit}>
@@ -281,6 +317,9 @@ const mapStateToProps = (state) => ({
   },
   auth: {
     ...state.auth,
+  },
+  search: {
+    ...state.search,
   },
 });
 
