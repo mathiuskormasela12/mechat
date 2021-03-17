@@ -32,6 +32,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'flex-end',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
   },
   primary: {
     backgroundColor: '#5F2EEA',
@@ -51,6 +53,7 @@ const styles = StyleSheet.create({
     width: 'auto',
     height: 'auto',
     flexWrap: 'wrap',
+    marginBottom: 18,
   },
   white: {
     color: 'white',

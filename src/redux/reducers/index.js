@@ -9,6 +9,7 @@ import authReducer from './auth';
 import loadingReducer from './loading';
 import userReducer from './user';
 import searchReducer from './search';
+import chatReducer from './chat';
 
 const rootPersistConfig = {
   key: 'root',
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
   loading: loadingReducer,
   user: userReducer,
   search: searchReducer,
+  chat: chatReducer,
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);

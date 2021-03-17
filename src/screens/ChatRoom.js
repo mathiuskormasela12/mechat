@@ -2,6 +2,11 @@
 // import all modules
 import React, {Component, Fragment} from 'react';
 import {View, TouchableOpacity, FlatList, StyleSheet} from 'react-native';
+import {connect} from 'react-redux';
+import http from '../services/Services';
+import io from '../helpers/socket';
+import formData from '../helpers/formData';
+import {setChat} from '../redux/actions/chat';
 
 // import all components
 import {TextField, Container, ChatBuble} from '../components';
@@ -13,21 +18,68 @@ class ChatRoom extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      chats: [
-        {
-          userId: 1,
-          message: 'Hello Mathius',
-          mine: false,
-          time: '20:30',
-        },
-        {
-          userId: 2,
-          message: 'Knp',
-          mine: true,
-          time: '09:00',
-        },
-      ],
+      chats: [],
+      chat: null,
     };
+  }
+
+  getChatList = async () => {
+    const {id} = this.props.route.params;
+    try {
+      const {data} = await http.getChatList(this.props.auth.token, id, {
+        keyword: this.props.search.keyword,
+        sort: this.props.search.isASC ? 'ASC' : 'DESC',
+        page: 1,
+      });
+      // this.setState({
+      //   chats: data.results,
+      // });
+      this.props.setChat(data.results);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  handleInput = (value) => {
+    this.setState({
+      chat: value,
+    });
+  };
+
+  handleSubmit = async () => {
+    const {id} = this.props.route.params;
+
+    const forms = formData('URLSearchParams', {
+      friendId: id,
+      message: this.state.chat,
+    });
+    try {
+      await http.createChat(this.props.auth.token, forms);
+      this.setState({
+        chat: null,
+      });
+    } catch (err) {
+      console.log(err.response.data.message);
+    }
+  };
+
+  componentDidMount() {
+    this.getChatList();
+    io.onAny(() => {
+      io.once('Send_Message', (msg) => {
+        console.log(msg);
+        this.getChatList();
+      });
+    });
+  }
+
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.search.keyword !== this.props.search.keyword ||
+      prevProps.search.isASC !== this.props.search.isASC
+    ) {
+      this.getChatList();
+    }
   }
 
   render() {
@@ -36,8 +88,9 @@ class ChatRoom extends Component {
         <View style={styles.hero}>
           <Container style={styles.containerPadding}>
             <FlatList
-              data={this.state.chats}
+              data={this.props.chat.chats}
               keyExtractor={(item, index) => String(index)}
+              inverted={true}
               renderItem={({item}) => (
                 <ChatBuble
                   mine={item.mine}
@@ -55,10 +108,14 @@ class ChatRoom extends Component {
                     keyboardType="default"
                     placeholder="Type Your Message ...."
                     height={45}
+                    onChangeText={this.handleInput}
+                    value={this.state.chat}
                   />
                 </View>
                 <View style={styles.btnCol}>
-                  <TouchableOpacity style={styles.contact}>
+                  <TouchableOpacity
+                    style={styles.contact}
+                    onPress={this.handleSubmit}>
                     <Icon name="send-outline" size={15} color="white" />
                   </TouchableOpacity>
                 </View>
@@ -71,7 +128,19 @@ class ChatRoom extends Component {
   }
 }
 
-export default ChatRoom;
+const mapStateToProps = (states) => {
+  return {
+    auth: states.auth,
+    search: states.search,
+    chat: states.chat,
+  };
+};
+
+const mapDispatchToProps = {
+  setChat,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChatRoom);
 
 const styles = StyleSheet.create({
   hero: {

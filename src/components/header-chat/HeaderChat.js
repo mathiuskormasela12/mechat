@@ -1,6 +1,6 @@
 // ===== Header
 // import all modules
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,21 +9,25 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
+import http from '../../services/Services';
 
 // import all actions
 import {sort, search} from '../../redux/actions/search';
 
 // import all assets
-import profile from '../../assets/img/profile.png';
+// import profile from '../../assets/img/profile.png';
 
-export function HeaderChat() {
+export function HeaderChat(props) {
   const [showSearchBar, setShowSearchBar] = useState(false);
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const route = useRoute();
   const {isASC: isAsc} = useSelector((current) => current.search);
+  const token = useSelector((current) => current.auth.token);
+  const [profile, setProfile] = useState({});
 
   const handleShowSearchBar = () =>
     setShowSearchBar((currentState) => !currentState);
@@ -31,6 +35,20 @@ export function HeaderChat() {
   const back = () => navigation.navigate('Home');
   const handleAsc = () => dispatch(sort());
   const handleSearch = (value) => dispatch(search(value));
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const {data} = await http.getContactById(token, route.params.contactId);
+        setProfile(data.results);
+      } catch (err) {
+        console.log(err);
+        setProfile({});
+      }
+    };
+
+    fetchData();
+  }, [route.params.contactId, token]);
 
   return (
     <Fragment>
@@ -43,11 +61,16 @@ export function HeaderChat() {
                   <Icon name="arrow-back-outline" color="#BEBEBE" size={25} />
                 </TouchableOpacity>
                 <TouchableOpacity>
-                  <Image source={profile} style={styles.img} />
+                  <Image
+                    source={{
+                      uri: profile.picture,
+                    }}
+                    style={styles.img}
+                  />
                 </TouchableOpacity>
               </View>
               <View style={styles.coloumn}>
-                <Text style={styles.text}>Jihyo</Text>
+                <Text style={styles.text}>{profile.contact_name}</Text>
               </View>
               <View style={styles.secondColoumn}>
                 <TouchableOpacity onPress={handleShowSearchBar}>
@@ -116,9 +139,10 @@ const styles = StyleSheet.create({
     color: '#14142B',
   },
   img: {
-    resizeMode: 'contain',
+    resizeMode: 'cover',
     height: 40,
     width: 40,
+    borderRadius: 40,
     marginLeft: 10,
   },
   firstColoumn: {

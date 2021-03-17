@@ -17,6 +17,14 @@ class Services {
     return http(token).get(`/user/${id}`);
   }
 
+  getContactById(token, id) {
+    return http(token).get(`/contact/${id}`);
+  }
+
+  createChat(token, data) {
+    return http(token).post('/chat', data);
+  }
+
   upload(token, id, data) {
     return http(token).put(`/user/upload/${id}`, data);
   }
@@ -43,6 +51,12 @@ class Services {
 
   createContact(token, data) {
     return http(token).post('/contact', data);
+  }
+
+  getChatList(token, id, data) {
+    return http(token).get(
+      `/chat/${id}/?page=${data.page}&search=${data.keyword}`,
+    );
   }
 
   getContactList(token, data) {

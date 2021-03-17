@@ -64,7 +64,7 @@ export default function StackScreen() {
           <Stack.Screen
             name="Chat Room"
             component={ChatRoom}
-            options={{header: () => <HeaderChat />}}
+            options={{header: ({header}) => <HeaderChat header={header} />}}
           />
           <Stack.Screen
             name="Profile"

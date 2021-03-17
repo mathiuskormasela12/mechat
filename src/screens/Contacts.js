@@ -292,6 +292,8 @@ class Contacts extends Component {
                   }}
                   name={item.contact_name}
                   status={item.status}
+                  id={item.friend_id}
+                  contactId={item.id}
                 />
               )}
             />
