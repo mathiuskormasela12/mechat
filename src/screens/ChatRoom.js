@@ -20,21 +20,101 @@ class ChatRoom extends Component {
     this.state = {
       chats: [],
       chat: null,
+      listRefresh: false,
+      page: 1,
     };
   }
 
   getChatList = async () => {
     const {id} = this.props.route.params;
+    console.log('========== ID =======');
+    console.log(id);
     try {
       const {data} = await http.getChatList(this.props.auth.token, id, {
         keyword: this.props.search.keyword,
         sort: this.props.search.isASC ? 'ASC' : 'DESC',
         page: 1,
       });
+
+      if (data.pageInfo.currentPage < data.pageInfo.totalPage) {
+        this.setState((c) => ({
+          ...c,
+          page: Number(c.page) + 1,
+        }));
+      }
+
+      this.props.setChat(data.results);
+      console.log('========== IDS =======');
+      console.log(this.props.chat.chats);
       // this.setState({
       //   chats: data.results,
       // });
-      this.props.setChat(data.results);
+    } catch (err) {
+      this.props.setChat([]);
+      console.log(err.message);
+    }
+  };
+
+  fetchNewData = async () => {
+    this.setState({
+      listRefresh: true,
+    });
+
+    const {id} = this.props.route.params;
+    try {
+      const {data} = await http.getChatList(this.props.auth.token, id, {
+        keyword: this.props.search.keyword,
+        sort: this.props.search.isASC ? 'ASC' : 'DESC',
+        page: this.state.page,
+      });
+
+      const {chats} = this.props.chat;
+      const newData = [...chats, ...data.results];
+      this.props.setChat(newData);
+      if (data.pageInfo.currentPage < data.pageInfo.totalPage) {
+        this.setState((c) => ({
+          ...c,
+          page: Number(c.page) + 1,
+        }));
+      }
+      this.setState({
+        listRefresh: false,
+      });
+    } catch (err) {
+      this.setState({
+        listRefresh: false,
+      });
+      console.log(err.message);
+    }
+  };
+
+  getNextChatList = async () => {
+    const {id} = this.props.route.params;
+    try {
+      const {data} = await http.getChatList(this.props.auth.token, id, {
+        keyword: this.props.search.keyword,
+        sort: this.props.search.isASC ? 'ASC' : 'DESC',
+        page: this.state.page,
+      });
+      this.setState({
+        link: data.pageInfo.nextLink,
+      });
+      // this.setState({
+      //   chats: data.results,
+      // });
+
+      if (data.pageInfo.currentPage <= data.pageInfo.totalPage) {
+        const {chats} = this.props.chat;
+        const newData = [...chats, ...data.results];
+        this.props.setChat(newData);
+        this.setState((c) => ({
+          ...c,
+          page: Number(c.page) + 1,
+        }));
+      }
+      this.setState({
+        listRefresh: false,
+      });
     } catch (err) {
       console.log(err.message);
     }
@@ -88,9 +168,9 @@ class ChatRoom extends Component {
         <View style={styles.hero}>
           <Container style={styles.containerPadding}>
             <FlatList
+              showsVerticalScrollIndicator={false}
               data={this.props.chat.chats}
-              keyExtractor={(item, index) => String(index)}
-              inverted={true}
+              inverted
               renderItem={({item}) => (
                 <ChatBuble
                   mine={item.mine}
@@ -98,6 +178,9 @@ class ChatRoom extends Component {
                   time={item.time}
                 />
               )}
+              keyExtractor={(item, index) => String(index)}
+              onEndReached={this.getNextChatList}
+              onEndReachedThreshold={0.5}
             />
           </Container>
           <View style={styles.chatFooter}>
@@ -181,7 +264,7 @@ const styles = StyleSheet.create({
   },
   containerPadding: {
     flex: 1,
-    paddingVertical: 32,
+    paddingTop: 32,
     width: '90%',
   },
 });

@@ -188,12 +188,14 @@ class Contacts extends Component {
         keyword: this.props.search.keyword,
       });
       this.setState((currentState) => ({
+        ...currentState,
         loading: !currentState.loading,
         contacts: data.results,
       }));
     } catch (err) {
       console.log(err);
       this.setState((currentState) => ({
+        ...currentState,
         loading: !currentState.loading,
         message: err.response.data.message,
       }));

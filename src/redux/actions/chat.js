@@ -6,3 +6,12 @@ export const setChat = (chats) => {
     },
   };
 };
+
+export const setChatList = (chats) => {
+  return {
+    type: 'SET_CHAT_LIST',
+    payload: {
+      chatList: chats,
+    },
+  };
+};

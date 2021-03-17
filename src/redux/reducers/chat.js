@@ -1,6 +1,7 @@
 // ===== Chat
 const initialState = {
   chats: [],
+  chatList: [],
 };
 
 const chatReducer = (state = initialState, action) => {
@@ -9,6 +10,13 @@ const chatReducer = (state = initialState, action) => {
       return {
         ...state,
         chats: action.payload.chats,
+      };
+    }
+
+    case 'SET_CHAT_LIST': {
+      return {
+        ...state,
+        chatList: action.payload.chatList,
       };
     }
 

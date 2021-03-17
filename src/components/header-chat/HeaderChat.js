@@ -32,7 +32,15 @@ export function HeaderChat(props) {
   const handleShowSearchBar = () =>
     setShowSearchBar((currentState) => !currentState);
 
-  const back = () => navigation.navigate('Home');
+  const back = () => {
+    navigation.navigate('Home');
+    dispatch({
+      type: 'SET_CHAT',
+      payload: {
+        chats: [],
+      },
+    });
+  };
   const handleAsc = () => dispatch(sort());
   const handleSearch = (value) => dispatch(search(value));
 

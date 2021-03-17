@@ -2,11 +2,12 @@
 // import all modules
 import React, {Component, Fragment} from 'react';
 import {View, FlatList, StyleSheet} from 'react-native';
+import http from '../services/Services';
+import {setChatList} from '../redux/actions/chat';
+import {connect} from 'react-redux';
 
 // import all components
 import {ChatList} from '../components';
-
-import profile from '../assets/img/profile.png';
 
 class Chats extends Component {
   constructor() {
@@ -45,18 +46,55 @@ class Chats extends Component {
     };
   }
 
+  async componentDidMount() {
+    try {
+      const {data} = await http.getChatHistory(this.props.auth.token, {
+        page: 1,
+        keyword: this.props.search.keyword,
+        sort: this.props.search.isASC ? 'ASC' : 'DESC',
+      });
+      this.props.setChatList(data.results);
+      console.log(data.results);
+    } catch (err) {
+      this.props.setChatList([]);
+      console.log(err);
+    }
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (
+      prevProps.search.keyword !== this.props.search.keyword ||
+      prevProps.search.isASC !== this.props.search.isASC
+    ) {
+      try {
+        const {data} = await http.getChatHistory(this.props.auth.token, {
+          page: 1,
+          keyword: this.props.search.keyword,
+          sort: this.props.search.isASC ? 'ASC' : 'DESC',
+        });
+        this.props.setChatList(data.results);
+        console.log(data.results);
+      } catch (err) {
+        this.props.setChatList([]);
+        console.log(err);
+      }
+    }
+  }
+
   render() {
     return (
       <Fragment>
         <View style={styles.hero}>
           <FlatList
-            data={this.state.messages}
+            data={this.props.chat.chatList}
             keyExtractor={(item, index) => String(index)}
             renderItem={({item}) => (
               <ChatList
-                picture={profile}
-                name={item.name}
+                name={item.contact_name}
                 message={item.message}
+                picture={item.picture}
+                time={item.createdAt}
+                id={item.friend_id}
               />
             )}
           />
@@ -66,7 +104,17 @@ class Chats extends Component {
   }
 }
 
-export default Chats;
+const mapStateToProps = (states) => ({
+  auth: states.auth,
+  chat: states.chat,
+  search: states.search,
+});
+
+const mapDispatchToProps = {
+  setChatList,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Chats);
 
 const styles = StyleSheet.create({
   text: {

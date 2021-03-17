@@ -7,21 +7,26 @@ import {useNavigation} from '@react-navigation/native';
 export function ChatList(props) {
   const navigation = useNavigation();
 
-  const goToChatList = () => navigation.navigate('Chat Room');
+  const goToChatList = (id) => navigation.navigate('Chat Room', {id});
 
   return (
     <Fragment>
-      <TouchableOpacity onPress={goToChatList}>
+      <TouchableOpacity onPress={() => goToChatList(props.id)}>
         <View style={styles.card}>
           <View style={[styles.col, styles.little]}>
-            <Image source={props.picture} style={styles.img} />
+            <Image
+              source={{
+                uri: props.picture,
+              }}
+              style={styles.img}
+            />
           </View>
           <View style={[styles.col, styles.big]}>
             <Text style={styles.name}>{props.name}</Text>
             <Text style={styles.message}>{props.message}</Text>
           </View>
           <View style={[styles.col, styles.aside]}>
-            <Text style={styles.time}>13:00</Text>
+            <Text style={styles.time}>{props.time}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -31,9 +36,10 @@ export function ChatList(props) {
 
 const styles = StyleSheet.create({
   img: {
-    resizeMode: 'contain',
+    resizeMode: 'cover',
     height: 50,
     width: 50,
+    borderRadius: 40,
   },
   card: {
     width: '100%',

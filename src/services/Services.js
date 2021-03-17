@@ -53,6 +53,12 @@ class Services {
     return http(token).post('/contact', data);
   }
 
+  getChatHistory(token, data) {
+    return http(token).get(
+      `/history/?page=${data.page}&search=${data.keyword}&sort=${data.sort}`,
+    );
+  }
+
   getChatList(token, id, data) {
     return http(token).get(
       `/chat/${id}/?page=${data.page}&search=${data.keyword}`,
