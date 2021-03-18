@@ -17,6 +17,7 @@ import formData from '../helpers/formData';
 import {showMessage} from 'react-native-flash-message';
 import io from '../helpers/socket';
 import jwtdecode from 'jwt-decode';
+import {setContact} from '../redux/actions/chat';
 
 // import all components
 import {
@@ -156,51 +157,63 @@ class Contacts extends Component {
     }
   }
 
-  componentDidMount() {
-    const decode = jwtdecode(this.props.auth.token);
-    this.fetchData();
-    io.onAny(() => {
-      io.once(`Update_Contact_${decode.id}`, (msg) => {
-        console.log(msg);
-        this.fetchData();
-      });
-    });
-  }
+  // componentDidMount() {
+  //   // const decode = jwtdecode(this.props.auth.token);
+  //   // this.fetchData();
+  //   this.props.setContact(
+  //     this.props.auth.token,
+  //     this.props.chat.page,
+  //     this.props.search.isASC,
+  //     this.props.search.keyword,
+  //   );
+  //   // io.onAny(() => {
+  //   //   io.once(`Update_Contact_${decode.id}`, (msg) => {
+  //   //     console.log(msg);
+  //   //     this.fetchData();
+  //   //   });
+  //   // });
+  // }
 
   componentDidUpdate(prevProps) {
     if (
       prevProps.search.keyword !== this.props.search.keyword ||
       prevProps.search.isASC !== this.props.search.isASC
     ) {
-      this.fetchData();
+      // this.fetchData();
+      this.props.setContact(
+        this.props.auth.token,
+        this.props.chat.page,
+        this.props.search.isASC,
+        this.props.search.keyword,
+      );
     }
   }
 
-  fetchData = async () => {
-    this.setState((currentState) => ({
-      loading: !currentState.loading,
-    }));
-    try {
-      const {data} = await http.getContactList(this.props.auth.token, {
-        page: 1,
-        sort: this.props.search.isASC ? 'ASC' : 'DESC',
-        by: 'contact_name',
-        keyword: this.props.search.keyword,
-      });
-      this.setState((currentState) => ({
-        ...currentState,
-        loading: !currentState.loading,
-        contacts: data.results,
-      }));
-    } catch (err) {
-      console.log(err);
-      this.setState((currentState) => ({
-        ...currentState,
-        loading: !currentState.loading,
-        message: err.response.data.message,
-      }));
-    }
-  };
+  // fetchData = async () => {
+  //   this.setState((currentState) => ({
+  //     loading: !currentState.loading,
+  //   }));
+  //   try {
+  //     const {data} = await http.getContactList(this.props.auth.token, {
+  //       page: 1,
+  //       sort: this.props.search.isASC ? 'ASC' : 'DESC',
+  //       by: 'contact_name',
+  //       keyword: this.props.search.keyword,
+  //     });
+  //     this.setState((currentState) => ({
+  //       ...currentState,
+  //       loading: !currentState.loading,
+  //       contacts: data.results,
+  //     }));
+  //   } catch (err) {
+  //     console.log(err);
+  //     this.setState((currentState) => ({
+  //       ...currentState,
+  //       loading: !currentState.loading,
+  //       message: err.response.data.message,
+  //     }));
+  //   }
+  // };
 
   render() {
     return (
@@ -283,9 +296,9 @@ class Contacts extends Component {
             <View style={styles.flexbox}>
               <MiniLoading />
             </View>
-          ) : this.state.contacts.length > 0 ? (
+          ) : this.props.chat.contacts.length > 0 ? (
             <FlatList
-              data={this.state.contacts}
+              data={this.props.chat.contacts}
               keyExtractor={(item, index) => String(index)}
               renderItem={({item}) => (
                 <ContactList
@@ -301,7 +314,9 @@ class Contacts extends Component {
             />
           ) : (
             <View style={styles.flexbox}>
-              <Text style={styles.flexText}>{this.state.message}</Text>
+              <Text style={styles.flexText}>
+                {this.props.chat.messageContact}
+              </Text>
             </View>
           )}
           <TouchableOpacity
@@ -325,10 +340,14 @@ const mapStateToProps = (state) => ({
   search: {
     ...state.search,
   },
+  chat: {
+    ...state.chat,
+  },
 });
 
 const mapDispatchToProps = {
   showWrapper,
+  setContact,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Contacts);

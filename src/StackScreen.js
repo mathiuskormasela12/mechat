@@ -17,6 +17,7 @@ import Profile from './screens/Profile';
 
 // import all component
 import {Header, Wrapper, HeaderChat} from './components';
+import Root from './screens/Root';
 
 const Stack = createStackNavigator();
 
@@ -31,7 +32,7 @@ export default function StackScreen() {
   });
 
   return (
-    <Fragment>
+    <Root>
       <NavigationContainer>
         <Stack.Navigator>
           {token ? (
@@ -90,6 +91,6 @@ export default function StackScreen() {
       </NavigationContainer>
       {showWrapper && <Wrapper />}
       <FlashMessage position="top" />
-    </Fragment>
+    </Root>
   );
 }

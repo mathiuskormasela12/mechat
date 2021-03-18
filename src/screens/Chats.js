@@ -46,7 +46,7 @@ class Chats extends Component {
     };
   }
 
-  async componentDidMount() {
+  fetchData = async () => {
     try {
       const {data} = await http.getChatHistory(this.props.auth.token, {
         page: 1,
@@ -59,6 +59,10 @@ class Chats extends Component {
       this.props.setChatList([]);
       console.log(err);
     }
+  };
+
+  componentDidMount() {
+    this.fetchData();
   }
 
   async componentDidUpdate(prevProps) {
@@ -66,18 +70,7 @@ class Chats extends Component {
       prevProps.search.keyword !== this.props.search.keyword ||
       prevProps.search.isASC !== this.props.search.isASC
     ) {
-      try {
-        const {data} = await http.getChatHistory(this.props.auth.token, {
-          page: 1,
-          keyword: this.props.search.keyword,
-          sort: this.props.search.isASC ? 'ASC' : 'DESC',
-        });
-        this.props.setChatList(data.results);
-        console.log(data.results);
-      } catch (err) {
-        this.props.setChatList([]);
-        console.log(err);
-      }
+      this.fetchData();
     }
   }
 

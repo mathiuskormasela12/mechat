@@ -331,6 +331,9 @@ export default function Profile(props) {
       dispatch({
         type: 'LOGOUT',
       });
+      dispatch({
+        type: 'REMOVE_CHat',
+      });
       navigation.navigate('Auth');
     } catch (err) {
       console.log(err);
@@ -346,6 +349,9 @@ export default function Profile(props) {
   const logout = () => {
     dispatch({
       type: 'LOGOUT',
+    });
+    dispatch({
+      type: 'REMOVE_CONTACT',
     });
     navigation.navigate('Auth');
   };
