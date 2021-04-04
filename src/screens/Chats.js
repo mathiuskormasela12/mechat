@@ -1,12 +1,12 @@
 // ===== Chats
 // import all modules
 import React, {Component, Fragment} from 'react';
-import {View, FlatList, StyleSheet} from 'react-native';
+import {View, Text, FlatList, StyleSheet} from 'react-native';
 import {setHistory} from '../redux/actions/history';
 import {connect} from 'react-redux';
 
 // import all components
-import {ChatList} from '../components';
+import {ChatList, MiniLoading} from '../components';
 
 class Chats extends Component {
   fetchData = () => {
@@ -34,20 +34,30 @@ class Chats extends Component {
     return (
       <Fragment>
         <View style={styles.hero}>
-          <FlatList
-            data={this.props.history.histories}
-            keyExtractor={(item, index) => String(index)}
-            renderItem={({item}) => (
-              <ChatList
-                name={item.contact_name}
-                message={item.message}
-                picture={item.picture}
-                time={item.time}
-                id={item.friend_id}
-                contactId={item.id}
-              />
-            )}
-          />
+          {this.props.history.loading ? (
+            <View style={styles.flexbox}>
+              <MiniLoading />
+            </View>
+          ) : this.props.history.histories.length > 0 ? (
+            <FlatList
+              data={this.props.history.histories}
+              keyExtractor={(item, index) => String(index)}
+              renderItem={({item}) => (
+                <ChatList
+                  name={item.contact_name}
+                  message={item.message}
+                  picture={item.picture}
+                  time={item.time}
+                  id={item.friend_id}
+                  contactId={item.id}
+                />
+              )}
+            />
+          ) : (
+            <View style={styles.flexbox}>
+              <Text style={styles.flexText}>{this.props.history.message}</Text>
+            </View>
+          )}
         </View>
       </Fragment>
     );
@@ -73,5 +83,15 @@ const styles = StyleSheet.create({
   hero: {
     flex: 1,
     backgroundColor: 'white',
+  },
+  flexbox: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  flexText: {
+    fontFamily: 'ProximaNova-Regular',
+    fontSize: 16,
+    color: '#14142B',
   },
 });

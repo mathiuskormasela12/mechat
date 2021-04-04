@@ -2,6 +2,8 @@
 const initialState = {
   histories: [],
   page: 1,
+  loading: false,
+  message: null,
 };
 
 const historyReducer = (state = initialState, action) => {
@@ -19,6 +21,20 @@ const historyReducer = (state = initialState, action) => {
       return {
         ...state,
         histories: data,
+      };
+    }
+
+    case 'SET_MESSAGE': {
+      return {
+        ...state,
+        message: action.payload.message,
+      };
+    }
+
+    case 'SET_LOADING': {
+      return {
+        ...state,
+        loading: !state.loading,
       };
     }
 

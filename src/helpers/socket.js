@@ -1,7 +1,6 @@
 import {io} from 'socket.io-client';
-import {API_URL} from '@env';
-console.log('========= API =====');
-console.log(API_URL);
-const socket = io('http://192.168.1.32:5000');
+import {APP_URL} from '@env';
+
+const socket = io(APP_URL);
 
 export default socket;
