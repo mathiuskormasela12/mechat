@@ -6,7 +6,7 @@ import {setHistory} from '../redux/actions/history';
 import {connect} from 'react-redux';
 
 // import all components
-import {ChatList, MiniLoading} from '../components';
+import {ChatList} from '../components';
 
 class Chats extends Component {
   fetchData = () => {
@@ -34,11 +34,7 @@ class Chats extends Component {
     return (
       <Fragment>
         <View style={styles.hero}>
-          {this.props.history.loading ? (
-            <View style={styles.flexbox}>
-              <MiniLoading />
-            </View>
-          ) : this.props.history.histories.length > 0 ? (
+          {this.props.history.histories.length > 0 ? (
             <FlatList
               data={this.props.history.histories}
               keyExtractor={(item, index) => String(index)}

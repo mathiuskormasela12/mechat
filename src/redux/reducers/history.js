@@ -2,7 +2,6 @@
 const initialState = {
   histories: [],
   page: 1,
-  loading: false,
   message: null,
 };
 
@@ -28,13 +27,6 @@ const historyReducer = (state = initialState, action) => {
       return {
         ...state,
         message: action.payload.message,
-      };
-    }
-
-    case 'SET_LOADING': {
-      return {
-        ...state,
-        loading: !state.loading,
       };
     }
 
