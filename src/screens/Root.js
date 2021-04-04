@@ -16,31 +16,43 @@ export default function Root(props) {
     if (token) {
       dispatch(setContact(token, chat.page, search.isASC, search.keyword));
     }
-    if (id && token) {
-      const decode = jwtdecode(token);
 
-      io.onAny(() => {
+    io.onAny(() => {
+      if (token && id) {
+        const decode = jwtdecode(token);
+
         io.once(`Update_Contact_${decode.id}`, (msg) => {
           console.log(msg);
           dispatch(setContact(token, chat.page, search.isASC, search.keyword));
         });
-      });
 
-      io.onAny(() => {
         io.once(`Send_Message_${decode.id}`, (msg) => {
           console.log(msg);
           dispatch(setChat(token, id));
         });
-      });
 
-      io.onAny(() => {
         io.once(`Retrieve_Message_${decode.id}`, (msg) => {
           console.log(msg);
           dispatch(setChat(token, id));
+        });
+
+        io.once(`Retrieve_Message_${decode.id}`, (msg) => {
+          console.log(msg);
           dispatch(setHistory(token, search.keyword, search.isASC));
         });
-      });
-    }
+      } else if (token && !id) {
+        const decode = jwtdecode(token);
+        io.once(`Update_Contact_${decode.id}`, (msg) => {
+          console.log(msg);
+          dispatch(setContact(token, chat.page, search.isASC, search.keyword));
+        });
+
+        io.once(`Retrieve_Message_${decode.id}`, (msg) => {
+          console.log(msg);
+          dispatch(setHistory(token, search.keyword, search.isASC));
+        });
+      }
+    });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, token, id]);

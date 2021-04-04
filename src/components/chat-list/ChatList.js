@@ -7,11 +7,12 @@ import {useNavigation} from '@react-navigation/native';
 export function ChatList(props) {
   const navigation = useNavigation();
 
-  const goToChatList = (id) => navigation.navigate('Chat Room', {id});
+  const goToChatList = (id, contactId) =>
+    navigation.navigate('Chat Room', {id, contactId});
 
   return (
     <Fragment>
-      <TouchableOpacity onPress={() => goToChatList(props.id)}>
+      <TouchableOpacity onPress={() => goToChatList(props.id, props.contactId)}>
         <View style={styles.card}>
           <View style={[styles.col, styles.little]}>
             <Image

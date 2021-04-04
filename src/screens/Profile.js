@@ -153,32 +153,6 @@ export default function Profile(props) {
         };
       }
     });
-
-    // if (state.value === '') {
-    //   setState((c) => ({
-    //     ...c,
-    //     message: `${name} can't be empty`,
-    //     alertType: 'warning',
-    //   }));
-    // }
-    // setState((currentState) => ({
-    //   ...currentState,
-    //   placeholder,
-    //   name,
-    //   label,
-    //   type,
-    //   message: null,
-    //   alertType: null,
-    //   value: user[name],
-    // }));
-
-    // if (state.value === '') {
-    //   setState((c) => ({
-    //     ...c,
-    //     message: `${name} can't be empty`,
-    //     alertType: 'warning',
-    //   }));
-    // }
   };
 
   const handleInput = (value) => {
@@ -440,7 +414,9 @@ export default function Profile(props) {
                     <Text style={styles.tel}>{user.phoneNumber}</Text>
                   </View>
                   <View style={[styles.boxCol, styles.boxColFlex]}>
-                    <TouchableOpacity style={styles.buble}>
+                    <TouchableOpacity
+                      style={styles.buble}
+                      onPress={() => navigation.navigate('Home')}>
                       <Icon name="chatbubble" color="white" size={18} />
                     </TouchableOpacity>
                     <TouchableOpacity

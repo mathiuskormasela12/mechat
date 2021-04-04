@@ -44,6 +44,7 @@ class Chats extends Component {
                 picture={item.picture}
                 time={item.time}
                 id={item.friend_id}
+                contactId={item.id}
               />
             )}
           />
