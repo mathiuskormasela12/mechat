@@ -10,11 +10,12 @@ import loadingReducer from './loading';
 import userReducer from './user';
 import searchReducer from './search';
 import chatReducer from './chat';
+import historyReducer from './history';
 
 const rootPersistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  blacklist: ['auth', 'loading'],
+  blacklist: ['auth', 'loading', 'user', 'search', 'chat', 'history'],
 };
 
 const authPersistConfig = {
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   search: searchReducer,
   chat: chatReducer,
+  history: historyReducer,
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);

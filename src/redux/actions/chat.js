@@ -75,14 +75,6 @@ export const setContact = (token, page, isASC, keyword) => {
         by: 'contact_name',
       });
 
-      // if (data.pageInfo.currentPage <= data.pageInfo.totalPage) {
-      //   dispatch({
-      //     type: 'SET_CONTACT',
-      //     payload: {
-      //       contacts: data.results,
-      //     },
-      //   });
-      // }
       dispatch({
         type: 'SET_CONTACT',
         payload: {
@@ -90,8 +82,6 @@ export const setContact = (token, page, isASC, keyword) => {
         },
       });
     } catch (err) {
-      console.log('================ PAGE', page);
-      // console.log(err.response.data.message);
       dispatch({
         type: 'SET_CONTACT',
         payload: {
@@ -124,10 +114,3 @@ export const setChatList = (chats) => {
     },
   };
 };
-
-// return {
-//   type: 'SET_CHAT',
-//   payload: {
-//     chats,
-//   },
-// };

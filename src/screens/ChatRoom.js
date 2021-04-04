@@ -4,7 +4,6 @@ import React, {Component, Fragment} from 'react';
 import {View, TouchableOpacity, FlatList, StyleSheet} from 'react-native';
 import {connect} from 'react-redux';
 import http from '../services/Services';
-import io from '../helpers/socket';
 import formData from '../helpers/formData';
 import {setChat, setId, setChatNext} from '../redux/actions/chat';
 
@@ -26,66 +25,12 @@ class ChatRoom extends Component {
   }
 
   getChatList = async () => {
-    // const {id} = this.props.route.params;
-    // console.log('========== ID =======');
-    // console.log(id);
-    // try {
-    //   const {data} = await http.getChatList(this.props.auth.token, id, {
-    //     keyword: this.props.search.keyword,
-    //     sort: this.props.search.isASC ? 'ASC' : 'DESC',
-    //     page: 1,
-    //   });
-
-    //   if (data.pageInfo.currentPage < data.pageInfo.totalPage) {
-    //     this.setState((c) => ({
-    //       ...c,
-    //       page: Number(c.page) + 1,
-    //     }));
-    //   }
-
-    //   this.props.setChat(data.results);
-    //   console.log('========== IDS =======');
-    //   console.log(this.props.chat.chats);
-    //   // this.setState({
-    //   //   chats: data.results,
-    //   // });
-    // } catch (err) {
-    //   this.props.setChat([]);
-    //   console.log(err.message);
-    // }
     this.props.setChat(this.props.auth.token, this.props.route.params.id);
   };
 
   getNextChatList = async () => {
     const {id} = this.props.route.params;
-    // try {
-    //   const {data} = await http.getChatList(this.props.auth.token, id, {
-    //     keyword: this.props.search.keyword,
-    //     sort: this.props.search.isASC ? 'ASC' : 'DESC',
-    //     page: this.state.page,
-    //   });
-    //   this.setState({
-    //     link: data.pageInfo.nextLink,
-    //   });
-    //   // this.setState({
-    //   //   chats: data.results,
-    //   // });
 
-    //   if (data.pageInfo.currentPage <= data.pageInfo.totalPage) {
-    //     const {chats} = this.props.chat;
-    //     const newData = [...chats, ...data.results];
-    //     this.props.setChat(newData);
-    //     this.setState((c) => ({
-    //       ...c,
-    //       page: Number(c.page) + 1,
-    //     }));
-    //   }
-    //   this.setState({
-    //     listRefresh: false,
-    //   });
-    // } catch (err) {
-    //   console.log(err.message);
-    // }
     this.props.setChatNext(
       this.props.auth.token,
       id,
@@ -116,20 +61,12 @@ class ChatRoom extends Component {
       this.setState({
         chat: null,
       });
-      this.getChatList();
     } catch (err) {
       console.log(err.response.data.message);
     }
   };
 
   componentDidMount() {
-    // this.getChatList();
-    // io.onAny(() => {
-    //   io.once('Send_Message', (msg) => {
-    //     console.log(msg);
-    //     this.getChatList();
-    //   });
-    // });
     this.props.setId(this.props.route.params.id);
     this.getChatList();
   }
@@ -140,7 +77,6 @@ class ChatRoom extends Component {
       prevProps.search.isASC !== this.props.search.isASC
     ) {
       this.getChatList();
-      // this.props.setChat(this.props.route.params.id);
     }
   }
 

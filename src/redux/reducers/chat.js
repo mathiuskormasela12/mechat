@@ -11,7 +11,6 @@ const initialState = {
 const chatReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'SET_CHAT': {
-      console.log('======= DATA DARI PAYLOAD =========');
       console.log(action.payload.chats);
       return {
         ...state,
