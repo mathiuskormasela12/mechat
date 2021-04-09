@@ -1,7 +1,7 @@
 import React, {useEffect, Fragment} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {setChat, setContact} from '../redux/actions/chat';
-import {setHistory} from '../redux/actions/history';
+import {refreshHistory} from '../redux/actions/history';
 import io from '../helpers/socket';
 import jwtdecode from 'jwt-decode';
 
@@ -38,7 +38,7 @@ export default function Root(props) {
 
         io.once(`Retrieve_Message_${decode.id}`, (msg) => {
           console.log(msg);
-          dispatch(setHistory(token, search.keyword, search.isASC));
+          dispatch(refreshHistory(token, search.keyword, search.isASC));
         });
       } else if (token && !id) {
         const decode = jwtdecode(token);
@@ -49,7 +49,7 @@ export default function Root(props) {
 
         io.once(`Retrieve_Message_${decode.id}`, (msg) => {
           console.log(msg);
-          dispatch(setHistory(token, search.keyword, search.isASC));
+          dispatch(refreshHistory(token, search.keyword, search.isASC));
         });
       }
     });
